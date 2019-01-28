@@ -1,27 +1,11 @@
 
 
-# The primary input to Qdec is a text file, named qdec.table.dat,
-#   containing the subject IDs, and discrete (categorical) and
-#   continuous factors, in table format.
-# This is essentially a table of demographics for your subjects
-#   including all the variables and factors that you wish to consider.
-#   You may have different discrete (categorical) factor names and levels
-#   (or even no discrete factors,
-#   in which case all column data are assumed to be continuous factors).
-# If you want to control the order the factors appear in the display:
-#   For each discrete (categorical) factor, there could exist a file named
-#     <factor>.levels
-#   which lists all possible levels.
-#   These ... can be used to control the order different factors are displayed.
-# For organizational purposes it is best to make a directory called qdec
-#   within your $SUBJECTS_DIR.
-# You can save the qdec.table.dat file in there.
-# When Qdec runs it will also save your analyses to this directory.
 
 
-
-# Function for writing out a flat tab separate text file, ready to send to unix:
+# Function for writing a 'flat', newline-terminated, tab-separated, text file.
+#   Ready to open with unix:
 .flat_writer <- function(x, file, col.names = F, row.names = F, ...) {
+  x <- as.data.frame(x)
   A <- file(file, open = "wb") # binary mode to get rid of windows EOLs.
   utils::write.table(x, A,
               row.names = row.names, col.names = col.names,
@@ -32,9 +16,11 @@
 
 #' convert_df_to_qdec
 #'
-#' This function converts a data.frame with an indexing variable of freesurfer
-#'     subject IDs (\code{fsvar}) into a format ready for qdec.
-#'     It will optionally write out
+#' This function converts a \code{data.frame} with an indexing variable of
+#'     freesurfer subject IDs (\code{fsvar}) into a format ready for
+#'     \href{https://surfer.nmr.mgh.harvard.edu/fswiki/Qdec}{QDEC}.
+#'     It will optionally write out factor.levels files and dummy code your
+#'     factors.
 #'
 #' @param data object coercible to \code{\link{data.frame}}
 #' @param outroot path + root to output files: \itemize{
@@ -42,42 +28,93 @@
 #'     \item{\code{factor.levels} - factor level labels (one per factor)}
 #'     }
 #'     If missing (NA) then nothing is written.
-#' @param fsvar The variable in \code{data} containing the freesurfer id codes
-#'     (cooercible to case-correct character)
-#' @param factor.levels Should factor.levels label files be written.
-#' @return a data.frame for inspection
-#'     (function is primarily used for it's side effect of writing out files)
+#' @param fsvar character variable name in \code{data} containing
+#'     the freesurfer id codes.
+#' @param dummy.vars (character) names of variables which should be
+#'     dummy coded (see below).
+#' @param write.levels Should the factor.levels label files be written.
+#' @return a data.frame for inspection.
+#'    N.B. this function is primarily used for it's side-effect of
+#'         writing the files required for QDEC.
+#' @details \itemize{
+#'     \item{factor.levels are used to order factor levels for display.}
+#'     \item{QDEC's "Regression Coefficients" display option applies to the
+#'         first non-\code{fsvar} variable.}}
+#' @section dummy.vars: QDEC is limited in how it
+#'     models factors (\code{mri_glmfit} is much better).
+#'     QDEC *always* includes interactions between factors of interest
+#'     and covariates, even if these may not be of interest.
+#'     This is a "different-onset, different-slope" or
+#'     \href{https://surfer.nmr.mgh.harvard.edu/fswiki/DodsDoss}{DODS} model
+#'     As a result, some complex models cannot be fit in QDEC, for example
+#'     when a nuisance factor has a large number of levels
+#'     (e.g. MRI-Site effects).
+#'     Factors can be dummy coded to get a Different Onset, Same Slope (DOSS)
+#'     model (i.e. one which does not include the interaction terms)
+#'     this will also work around factor limits.
+#'     For a factor with k-levels k-1 dummy predictors are created, the first
+#'     level of the factor is omitted as an implicit baseline/reference.
+#'     Finally, within QDEC all the dummy factors must then be selected
+#'     all together in 'Nuisance Factors'.
 #' @examples
-#' df <- data.frame(fsid = c("s1", "s2", "s3"),
-#'     A = 1:3,
-#'     B = letters[1:3],
-#'     C = as.factor(letters[4:6]),
-#'     D = as.ordered(letters[7:9]))
-#' convert_df_to_qdec(df, fsvar = "fsid")
+#' df <- data.frame(fsid = c("s1", "s2", "s3"), A = 1:3, B = letters[1:3],
+#'                  C = as.factor(letters[4:6]), D = as.ordered(letters[7:9]))
+#' convert_df_to_qdec(df, fsvar = "fsid", dummy.vars = "C")
 #' \dontrun{
-#' convert_df_to_qdec(df, fsvar = "fsid", outroot = "example_qdec_table")
+#' convert_df_to_qdec(df, fsvar = "fsid", dummy.vars = "C",
+#'     outroot = "example_qdec_table")
 #' }
 #' @export
 convert_df_to_qdec <- function(data,
                                fsvar = "fsid",
+                               dummy.vars = NA,
                                outroot = NA,
-                               factor.levels = T) {
-  data <- as.data.frame(data)
+                               write.levels = T) {
+  # The primary input to Qdec is a text file, named qdec.table.dat,
+  #   containing the subject IDs, and discrete (categorical) and
+  #   continuous factors, in table format.
+  # This is essentially a table of demographics for your subjects
+  #   including all the variables and factors that you wish to consider.
+  #   You may have different discrete (categorical) factor names and levels
+  #   (or even no discrete factors,
+  #   in which case all column data are assumed to be continuous factors).
 
-  if ( !fsvar %in% names(data) ) stop(paste0(fsvar, " not found in data"))
+  data <- as.data.frame(data)
+  if ( any(is.na(data)) ) {
+    warning(paste(sum(is.na(data)),
+                  "missing values found, affected cases removed"))
+    data <- data[stats::complete.cases(data), ]
+  }
+  if ( !identical(length(fsvar), 1L) )
+    stop("There can only be one Subject ID variable")
+  if ( !fsvar %in% names(data) )
+    stop(paste0(fsvar, " not found in data"))
 
   fsid <- data[, names(data) %in% fsvar]
   data <- data[, !names(data) %in% fsvar]
 
-  # first ordered factors get converted to numeric:
+  # first: ordered factors get converted to numeric:
   ords <- sapply(data, is.ordered)
-
   if ( any(ords) ) {
     data[, which(ords)] <- sapply(data[, which(ords), drop = F],
                                   function(x) as.numeric(x))
   }
 
-  # second make a list of factors and levels:
+  # second: dummy code factors if required:
+  if ( !identical(dummy.vars, NA) & !all(dummy.vars %in% colnames(data)) ) {
+    stop("all dummy.vars must be column names in data")
+  }
+
+  if ( !identical(dummy.vars, NA) ) {
+    if ( any(sapply(data[, dummy.vars], is.numeric)) )
+      stop("Dummy variables must be of type character or unordered factor")
+    dummys <- data[, which(colnames(data) %in% dummy.vars), drop = F]
+    data <- data[, which(!colnames(data) %in% dummy.vars), drop = F]
+    dummys <- data.frame(stats::model.matrix(stats::as.formula(~ .), dummys))
+    data <- data.frame(data, dummys[, -1])
+  }
+
+  # third: remaining discrete factors (and optionally their levels):
   f <- NA
   facs <- !sapply(data, is.numeric)
 
@@ -89,19 +126,24 @@ convert_df_to_qdec <- function(data,
 
   }
 
-  # third assemble data.frame:
+  # fourth: assemble data.frame and output
   R <- data.frame(fsid = fsid, data)
+
   if ( !is.na(outroot) ) {
+
     dir.create(outroot, showWarnings = F)
+
     .flat_writer(R,
                  file = paste0(outroot, "/", outroot, ".table.dat"),
                  col.names = T)
-    if ( factor.levels & !identical(f,NA) ) {
+
+    if ( write.levels & !identical(f, NA) ) {
       mapply(.flat_writer,
              x = f,
              file = paste0(outroot, "/", names(f)),
              col.names = F)
     }
   }
+
   return(list(data = R, factors = f))
 }

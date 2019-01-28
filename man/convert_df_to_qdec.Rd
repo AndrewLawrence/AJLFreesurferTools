@@ -4,14 +4,17 @@
 \alias{convert_df_to_qdec}
 \title{convert_df_to_qdec}
 \usage{
-convert_df_to_qdec(data, fsvar = "fsid", outroot = NA,
-  factor.levels = T)
+convert_df_to_qdec(data, fsvar = "fsid", dummy.vars = NA,
+  outroot = NA, write.levels = T)
 }
 \arguments{
 \item{data}{object coercible to \code{\link{data.frame}}}
 
-\item{fsvar}{The variable in \code{data} containing the freesurfer id codes
-(cooercible to case-correct character)}
+\item{fsvar}{character variable name in \code{data} containing
+the freesurfer id codes.}
+
+\item{dummy.vars}{(character) names of variables which should be
+dummy coded (see below).}
 
 \item{outroot}{path + root to output files: \itemize{
 \item{\code{outroot.table.dat} - table directly input to QDEC}
@@ -19,25 +22,51 @@ convert_df_to_qdec(data, fsvar = "fsid", outroot = NA,
 }
 If missing (NA) then nothing is written.}
 
-\item{factor.levels}{Should factor.levels label files be written.}
+\item{write.levels}{Should the factor.levels label files be written.}
 }
 \value{
-a data.frame for inspection
-    (function is primarily used for it's side effect of writing out files)
+a data.frame for inspection.
+N.B. this function is primarily used for it's side-effect of
+writing the files required for QDEC.
 }
 \description{
-This function converts a data.frame with an indexing variable of freesurfer
-    subject IDs (\code{fsvar}) into a format ready for qdec.
-    It will optionally write out
+This function converts a \code{data.frame} with an indexing variable of
+freesurfer subject IDs (\code{fsvar}) into a format ready for
+\href{https://surfer.nmr.mgh.harvard.edu/fswiki/Qdec}{QDEC}.
+It will optionally write out factor.levels files and dummy code your
+factors.
 }
+\details{
+\itemize{
+\item{factor.levels are used to order factor levels for display.}
+\item{QDEC's "Regression Coefficients" display option applies to the
+first non-\code{fsvar} variable.}}
+}
+\section{dummy.vars}{
+ QDEC is limited in how it
+models factors (\code{mri_glmfit} is much better).
+QDEC \emph{always} includes interactions between factors of interest
+and covariates, even if these may not be of interest.
+This is a "different-onset, different-slope" or
+\href{https://surfer.nmr.mgh.harvard.edu/fswiki/DodsDoss}{DODS} model
+As a result, some complex models cannot be fit in QDEC, for example
+when a nuisance factor has a large number of levels
+(e.g. MRI-Site effects).
+Factors can be dummy coded to get a Different Onset, Same Slope (DOSS)
+model (i.e. one which does not include the interaction terms)
+this will also work around factor limits.
+For a factor with k-levels k-1 dummy predictors are created, the first
+level of the factor is omitted as an implicit baseline/reference.
+Finally, within QDEC all the dummy factors must then be selected
+all together in 'Nuisance Factors'.
+}
+
 \examples{
-df <- data.frame(fsid = c("s1", "s2", "s3"),
-    A = 1:3,
-    B = letters[1:3],
-    C = as.factor(letters[4:6]),
-    D = as.ordered(letters[7:9]))
-convert_df_to_qdec(df, fsvar = "fsid")
+df <- data.frame(fsid = c("s1", "s2", "s3"), A = 1:3, B = letters[1:3],
+                 C = as.factor(letters[4:6]), D = as.ordered(letters[7:9]))
+convert_df_to_qdec(df, fsvar = "fsid", dummy.vars = "C")
 \dontrun{
-convert_df_to_qdec(df, fsvar = "fsid", outroot = "example_qdec_table")
+convert_df_to_qdec(df, fsvar = "fsid", dummy.vars = "C",
+    outroot = "example_qdec_table")
 }
 }

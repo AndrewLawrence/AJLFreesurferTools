@@ -1,0 +1,20 @@
+#' fsroi_info
+#'
+#' a dataset of meta-information about common Freesurfer regions/measures
+#'
+#' @format A data.frame with 200 rows and 17 variables:
+#'     \describe{
+#'     \item{Hemi}{Left (lh) or Right (rh) hemisphere}
+#'     \item{ROI}{standardised ROI name (lower case, alphabetical)}
+#'     \item{Measure}{volume, cortical thickness,
+#'          surface area, local gyrification index}
+#'     \item{lobecing}{A coarse classification of ROIs into lobes
+#'          (and cingulate cortex)}
+#'     \item{lobe}{A coarse classification of ROIs into lobes}
+#'     \item{Intensity}{Voxel value in FreesurferColorLUT.txt}
+#'     \item{cog?}{Center of Gravity for ROI (volume based)}
+#'     \item{col?}{FreesurferColorLUT.txt colour (R, G, B, Alpha)}
+#'     }
+#'
+#' @name fsroi_info
+"fsroi_info"

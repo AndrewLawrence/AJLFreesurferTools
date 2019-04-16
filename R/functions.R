@@ -4,15 +4,89 @@
 
 # Function for writing a 'flat', newline-terminated, tab-separated, text file.
 #   Ready to open with unix:
-.flat_writer <- function(x, file, col.names = F, row.names = F, ...) {
+.flat_writer <- function(x, file, col.names = FALSE, row.names = FALSE, ...) {
   x <- as.data.frame(x)
   A <- file(file, open = "wb") # binary mode to get rid of windows EOLs.
   utils::write.table(x, A,
-              row.names = row.names, col.names = col.names,
-              quote = F, eol = "\n", sep = "\t", ...)
+                     row.names = row.names, col.names = col.names,
+                     quote = FALSE, eol = "\n", sep = "\t", ...)
   close(A)
 }
 
+#' fsprettify
+#'
+#' Attempts to make a character vector of region names short and pretty.
+#'
+#' This is a WIP developed using the DKT atlas.
+#'
+#' @param x object coercible to character
+#' @param remove_hemi strip hemisphere infomation ^lh_|^rh_
+#' @param remove_measure strip measure infomation _lgi$|_vol$|_thickness$|_area$
+#' @param shorten make common anatomical substitutions
+#'     e.g. amyg = amygdala, OFC = orbitofrontal, medial = m
+#' @return a prettified character vector
+#' @export
+fsprettify <- function(x,
+                       remove_hemi = FALSE,
+                       remove_measure = TRUE,
+                       shorten = TRUE) {
+  x <- tolower(as.character(x)) # coerce lowercase:
+  if ( remove_measure ) {
+    x <- gsub("_lgi$|_vol$|_thickness$|_area$", "", x)
+  }
+  if ( remove_hemi ) {
+    x <- gsub("^lh_|^rh_", "", x)
+  }
+  if ( shorten ) {
+    # store result preshortening.
+    input <- x # store input.
+    # patten gets less specific, so specific cases handled first.
+    x <- stringr::str_replace_all(string = x,
+                                  pattern = c("cuneus" = "CUN",
+                                              "hippocampal" = "HC",
+                                              "hippocampus" = "HC",
+                                              "caudate" = "CAUD",
+                                              "insula" = "INS",
+                                              "thalamusproper" = "THAL",
+                                              "entorhinal" = "EC",
+                                              "pallidum" = "PALL",
+                                              "amygdala" = "AMYG",
+                                              "putamen" = "PUTA",
+                                              "accumbens" = "NA",
+                                              "fusiform" = "FFG",
+                                              "lingual" = "MOG",
+                                              "posteriorcingulate" = "PCC",
+                                              "anteriorcingulate" = "ACC",
+                                              "isthmuscingulate" = "ICC",
+                                              "middlefrontal" = "MFG",
+                                              "orbitofrontal" = "OFC",
+                                              "transversetemporal" = "TTG",
+                                              "supramarginal" = "SMG",
+                                              "superiorfrontal" = "SFG",
+                                              "superiortemporal" = "STG",
+                                              "superiorparietal" = "SPG",
+                                              "middletemporal" = "MTG",
+                                              "inferiortemporal" = "ITG",
+                                              "inferiorparietal" = "IPG",
+                                              "lateraloccipital" = "LOG",
+                                              "parsopercularis" = "IFGoper",
+                                              "parstriangularis" = "IFGtri",
+                                              "parsorbitalis" = "IFGorb",
+                                              "central" = "CEN",
+                                              "calcarine" = "CAL",
+                                              "rostral" = "r",
+                                              "medial" = "m",
+                                              "caudal" = "c",
+                                              "lateral" = "l",
+                                              "superior" = "s"))
+    if ( length(unique(input)) != length(unique(x)) ) {
+      warning("Shortened labels are not unique. Returning shorten = FALSE")
+      return(input)
+    }
+  }
+  # Check output is unique:
+  return(x)
+}
 
 #' convert_df_to_qdec
 #'
@@ -69,7 +143,7 @@ convert_df_to_qdec <- function(data,
                                fsvar = "fsid",
                                dummy.vars = NA,
                                outroot = NA,
-                               write.levels = T) {
+                               write.levels = TRUE) {
   # The primary input to Qdec is a text file, named qdec.table.dat,
   #   containing the subject IDs, and discrete (categorical) and
   #   continuous factors, in table format.
@@ -96,7 +170,7 @@ convert_df_to_qdec <- function(data,
   # first: ordered factors get converted to numeric:
   ords <- sapply(data, is.ordered)
   if ( any(ords) ) {
-    data[, which(ords)] <- sapply(data[, which(ords), drop = F],
+    data[, which(ords)] <- sapply(data[, which(ords), drop = FALSE],
                                   function(x) as.numeric(x))
   }
 
@@ -108,8 +182,8 @@ convert_df_to_qdec <- function(data,
   if ( !identical(dummy.vars, NA) ) {
     if ( any(sapply(data[, dummy.vars], is.numeric)) )
       stop("Dummy variables must be of type character or unordered factor")
-    dummys <- data[, which(colnames(data) %in% dummy.vars), drop = F]
-    data <- data[, which(!colnames(data) %in% dummy.vars), drop = F]
+    dummys <- data[, which(colnames(data) %in% dummy.vars), drop = FALSE]
+    data <- data[, which(!colnames(data) %in% dummy.vars), drop = FALSE]
     dummys <- data.frame(stats::model.matrix(stats::as.formula(~ .), dummys))
     data <- data.frame(data, dummys[, -1])
   }
@@ -120,7 +194,7 @@ convert_df_to_qdec <- function(data,
 
   if ( any(facs) ) {
 
-    flist <- data[, facs, drop = F]
+    flist <- data[, facs, drop = FALSE]
     f <- lapply(flist, function(x) levels(as.factor(x)))
     names(f) <- paste(names(f), "levels", sep = ".")
 
@@ -131,17 +205,17 @@ convert_df_to_qdec <- function(data,
 
   if ( !is.na(outroot) ) {
 
-    dir.create(outroot, showWarnings = F)
+    dir.create(outroot, showWarnings = FALSE)
 
     .flat_writer(R,
                  file = paste0(outroot, "/", outroot, ".table.dat"),
-                 col.names = T)
+                 col.names = TRUE)
 
     if ( write.levels & !identical(f, NA) ) {
       mapply(.flat_writer,
              x = f,
              file = paste0(outroot, "/", names(f)),
-             col.names = F)
+             col.names = FALSE)
     }
   }
 

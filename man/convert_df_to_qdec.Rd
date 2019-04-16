@@ -5,7 +5,7 @@
 \title{convert_df_to_qdec}
 \usage{
 convert_df_to_qdec(data, fsvar = "fsid", dummy.vars = NA,
-  outroot = NA, write.levels = T)
+  outroot = NA, write.levels = TRUE)
 }
 \arguments{
 \item{data}{object coercible to \code{\link{data.frame}}}

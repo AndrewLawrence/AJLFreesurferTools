@@ -2,10 +2,11 @@
 #'
 #' a dataset of meta-information about common Freesurfer regions/measures
 #'
-#' @format A data.frame with 200 rows and 17 variables:
+#' @format A data.frame with 200 rows and 19 variables:
 #'     \describe{
 #'     \item{Hemi}{Left (lh) or Right (rh) hemisphere}
 #'     \item{ROI}{standardised ROI name (lower case, alphabetical)}
+#'     \item{sROI}{abbreviated standardised ROI name)}
 #'     \item{Measure}{volume, cortical thickness,
 #'          surface area, local gyrification index}
 #'     \item{lobecing}{A coarse classification of ROIs into lobes

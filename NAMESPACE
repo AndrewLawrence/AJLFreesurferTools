@@ -2,3 +2,4 @@
 
 export(convert_df_to_qdec)
 export(fsprettify)
+importFrom(utils,write.table)

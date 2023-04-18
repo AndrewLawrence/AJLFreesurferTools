@@ -4,13 +4,21 @@
 
 # Function for writing a 'flat', newline-terminated, tab-separated, text file.
 #   Ready to open with unix:
-.flat_writer <- function(x, file, col.names = FALSE, row.names = FALSE, ...) {
+#' @importFrom utils write.table
+flat_writer <- function(x, file, col_names = FALSE, row_names = FALSE, ...) {
   x <- as.data.frame(x)
-  A <- file(file, open = "wb") # binary mode to get rid of windows EOLs.
-  utils::write.table(x, A,
-                     row.names = row.names, col.names = col.names,
-                     quote = FALSE, eol = "\n", sep = "\t", ...)
-  close(A)
+  f <- file(file, open = "wb") # binary mode to get rid of windows EOLs.
+  write.table(
+    x,
+    file = f,
+    row.names = row_names,
+    col.names = col_names,
+    quote = FALSE,
+    eol = "\n",
+    sep = "\t",
+    ...
+  )
+  close(f)
 }
 
 #' fsprettify
@@ -79,12 +87,12 @@ fsprettify <- function(x,
                                               "caudal" = "c",
                                               "lateral" = "l",
                                               "superior" = "s"))
+    # Check output is unique:
     if ( length(unique(input)) != length(unique(x)) ) {
       warning("Shortened labels are not unique. Returning shorten = FALSE")
       return(input)
     }
   }
-  # Check output is unique:
   return(x)
 }
 
@@ -104,9 +112,9 @@ fsprettify <- function(x,
 #'     If missing (NA) then nothing is written.
 #' @param fsvar character variable name in \code{data} containing
 #'     the freesurfer id codes.
-#' @param dummy.vars (character) names of variables which should be
+#' @param dummy_vars (character) names of variables which should be
 #'     dummy coded (see below).
-#' @param write.levels Should the factor.levels label files be written.
+#' @param write_levels Should the factor.levels label files be written.
 #' @return a data.frame for inspection.
 #'    N.B. this function is primarily used for it's side-effect of
 #'         writing the files required for QDEC.
@@ -114,7 +122,7 @@ fsprettify <- function(x,
 #'     \item{factor.levels are used to order factor levels for display.}
 #'     \item{QDEC's "Regression Coefficients" display option applies to the
 #'         first non-\code{fsvar} variable.}}
-#' @section dummy.vars: QDEC is limited in how it
+#' @section dummy_vars: QDEC is limited in how it
 #'     models factors (\code{mri_glmfit} is much better).
 #'     QDEC *always* includes interactions between factors of interest
 #'     and covariates, even if these may not be of interest.
@@ -133,17 +141,17 @@ fsprettify <- function(x,
 #' @examples
 #' df <- data.frame(fsid = c("s1", "s2", "s3"), A = 1:3, B = letters[1:3],
 #'                  C = as.factor(letters[4:6]), D = as.ordered(letters[7:9]))
-#' convert_df_to_qdec(df, fsvar = "fsid", dummy.vars = "C")
+#' convert_df_to_qdec(df, fsvar = "fsid", dummy_vars = "C")
 #' \dontrun{
-#' convert_df_to_qdec(df, fsvar = "fsid", dummy.vars = "C",
+#' convert_df_to_qdec(df, fsvar = "fsid", dummy_vars = "C",
 #'     outroot = "example_qdec_table")
 #' }
 #' @export
 convert_df_to_qdec <- function(data,
                                fsvar = "fsid",
-                               dummy.vars = NA,
+                               dummy_vars = NA,
                                outroot = NA,
-                               write.levels = TRUE) {
+                               write_levels = TRUE) {
   # The primary input to Qdec is a text file, named qdec.table.dat,
   #   containing the subject IDs, and discrete (categorical) and
   #   continuous factors, in table format.
@@ -175,15 +183,15 @@ convert_df_to_qdec <- function(data,
   }
 
   # second: dummy code factors if required:
-  if ( !identical(dummy.vars, NA) & !all(dummy.vars %in% colnames(data)) ) {
-    stop("all dummy.vars must be column names in data")
+  if ( !identical(dummy_vars, NA) && !all(dummy_vars %in% colnames(data)) ) {
+    stop("all dummy_vars must be column names in data")
   }
 
-  if ( !identical(dummy.vars, NA) ) {
-    if ( any(sapply(data[, dummy.vars], is.numeric)) )
+  if ( !identical(dummy_vars, NA) ) {
+    if ( any(sapply(data[, dummy_vars], is.numeric)) )
       stop("Dummy variables must be of type character or unordered factor")
-    dummys <- data[, which(colnames(data) %in% dummy.vars), drop = FALSE]
-    data <- data[, which(!colnames(data) %in% dummy.vars), drop = FALSE]
+    dummys <- data[, which(colnames(data) %in% dummy_vars), drop = FALSE]
+    data <- data[, which(!colnames(data) %in% dummy_vars), drop = FALSE]
     dummys <- data.frame(stats::model.matrix(stats::as.formula(~ .), dummys))
     data <- data.frame(data, dummys[, -1])
   }
@@ -201,23 +209,23 @@ convert_df_to_qdec <- function(data,
   }
 
   # fourth: assemble data.frame and output
-  R <- data.frame(fsid = fsid, data)
+  r <- data.frame(fsid = fsid, data)
 
   if ( !is.na(outroot) ) {
 
     dir.create(outroot, showWarnings = FALSE)
 
-    .flat_writer(R,
-                 file = paste0(outroot, "/", outroot, ".table.dat"),
-                 col.names = TRUE)
+    flat_writer(r,
+                file = paste0(outroot, "/", outroot, ".table.dat"),
+                col.names = TRUE)
 
-    if ( write.levels & !identical(f, NA) ) {
-      mapply(.flat_writer,
+    if ( write_levels && !identical(f, NA) ) {
+      mapply(flat_writer,
              x = f,
              file = paste0(outroot, "/", names(f)),
              col.names = FALSE)
     }
   }
 
-  return(list(data = R, factors = f))
+  return(list(data = r, factors = f))
 }

@@ -4,10 +4,12 @@
 \name{fsroi_info}
 \alias{fsroi_info}
 \title{fsroi_info}
-\format{A data.frame with 200 rows and 17 variables:
+\format{
+A data.frame with 200 rows and 19 variables:
 \describe{
 \item{Hemi}{Left (lh) or Right (rh) hemisphere}
 \item{ROI}{standardised ROI name (lower case, alphabetical)}
+\item{sROI}{abbreviated standardised ROI name)}
 \item{Measure}{volume, cortical thickness,
 surface area, local gyrification index}
 \item{lobecing}{A coarse classification of ROIs into lobes
@@ -16,7 +18,8 @@ surface area, local gyrification index}
 \item{Intensity}{Voxel value in FreesurferColorLUT.txt}
 \item{cog?}{Center of Gravity for ROI (volume based)}
 \item{col?}{FreesurferColorLUT.txt colour (R, G, B, Alpha)}
-}}
+}
+}
 \usage{
 fsroi_info
 }

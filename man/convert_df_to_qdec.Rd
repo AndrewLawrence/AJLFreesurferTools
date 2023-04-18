@@ -4,8 +4,13 @@
 \alias{convert_df_to_qdec}
 \title{convert_df_to_qdec}
 \usage{
-convert_df_to_qdec(data, fsvar = "fsid", dummy.vars = NA,
-  outroot = NA, write.levels = TRUE)
+convert_df_to_qdec(
+  data,
+  fsvar = "fsid",
+  dummy_vars = NA,
+  outroot = NA,
+  write_levels = TRUE
+)
 }
 \arguments{
 \item{data}{object coercible to \code{\link{data.frame}}}
@@ -13,7 +18,7 @@ convert_df_to_qdec(data, fsvar = "fsid", dummy.vars = NA,
 \item{fsvar}{character variable name in \code{data} containing
 the freesurfer id codes.}
 
-\item{dummy.vars}{(character) names of variables which should be
+\item{dummy_vars}{(character) names of variables which should be
 dummy coded (see below).}
 
 \item{outroot}{path + root to output files: \itemize{
@@ -22,7 +27,7 @@ dummy coded (see below).}
 }
 If missing (NA) then nothing is written.}
 
-\item{write.levels}{Should the factor.levels label files be written.}
+\item{write_levels}{Should the factor.levels label files be written.}
 }
 \value{
 a data.frame for inspection.
@@ -42,7 +47,7 @@ factors.
 \item{QDEC's "Regression Coefficients" display option applies to the
 first non-\code{fsvar} variable.}}
 }
-\section{dummy.vars}{
+\section{dummy_vars}{
  QDEC is limited in how it
 models factors (\code{mri_glmfit} is much better).
 QDEC \emph{always} includes interactions between factors of interest
@@ -64,9 +69,9 @@ all together in 'Nuisance Factors'.
 \examples{
 df <- data.frame(fsid = c("s1", "s2", "s3"), A = 1:3, B = letters[1:3],
                  C = as.factor(letters[4:6]), D = as.ordered(letters[7:9]))
-convert_df_to_qdec(df, fsvar = "fsid", dummy.vars = "C")
+convert_df_to_qdec(df, fsvar = "fsid", dummy_vars = "C")
 \dontrun{
-convert_df_to_qdec(df, fsvar = "fsid", dummy.vars = "C",
+convert_df_to_qdec(df, fsvar = "fsid", dummy_vars = "C",
     outroot = "example_qdec_table")
 }
 }

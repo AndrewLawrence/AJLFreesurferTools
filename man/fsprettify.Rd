@@ -4,8 +4,7 @@
 \alias{fsprettify}
 \title{fsprettify}
 \usage{
-fsprettify(x, remove_hemi = FALSE, remove_measure = TRUE,
-  shorten = TRUE)
+fsprettify(x, remove_hemi = FALSE, remove_measure = TRUE, shorten = TRUE)
 }
 \arguments{
 \item{x}{object coercible to character}

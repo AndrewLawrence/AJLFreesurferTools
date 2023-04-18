@@ -9,6 +9,7 @@ License: GPL (>=3)
 Encoding: UTF-8
 Imports: stringr
 LazyData: true
+Language: en-GB
 RoxygenNote: 7.2.3
 Roxygen: list(markdown = TRUE)
 Suggests: 

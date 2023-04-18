@@ -21,24 +21,29 @@ flat_writer <- function(x, file, col_names = FALSE, row_names = FALSE, ...) {
   close(f)
 }
 
-#' fsprettify
+#' fmt_atlaslabel
 #'
-#' Attempts to make a character vector of region names short and pretty.
+#' Common manipulations for atlas labels: remove hemisphere,
+#' remove measure, shorten labels.
 #'
-#' This is a WIP developed using the DKT atlas.
+#' This is a WIP developed using the DKT atlas. Note: this will not check if
+#' the result has as many unique levels as the input. If using this function,
+#' (particularly with the shorten option) verify it hasn't accidentally
+#' collapsed levels.
 #'
 #' @param x object coercible to character
-#' @param remove_hemi strip hemisphere infomation ^lh_|^rh_
-#' @param remove_measure strip measure infomation _lgi$|_vol$|_thickness$|_area$
-#' @param shorten make common anatomical substitutions
+#' @param remove_hemi strip hemisphere from start ^lh_|^rh_
+#' @param remove_measure strip measure from end _lgi$|_vol$|_thickness$|_area$
+#' @param shorten make shorter labels via common anatomical abbreviations
 #'     e.g. amyg = amygdala, OFC = orbitofrontal, medial = m
-#' @return a prettified character vector
+#' @return a character vector
 #' @export
-fsprettify <- function(x,
+fmt_atlaslabel <- function(x,
                        remove_hemi = FALSE,
                        remove_measure = TRUE,
                        shorten = TRUE) {
   x <- tolower(as.character(x)) # coerce lowercase:
+
   if ( remove_measure ) {
     x <- gsub("_lgi$|_vol$|_thickness$|_area$", "", x)
   }
@@ -46,9 +51,7 @@ fsprettify <- function(x,
     x <- gsub("^lh_|^rh_", "", x)
   }
   if ( shorten ) {
-    # store result preshortening.
-    input <- x # store input.
-    # patten gets less specific, so specific cases handled first.
+    # pattern gets less specific, so specific cases handled first.
     x <- stringr::str_replace_all(string = x,
                                   pattern = c("cuneus" = "CUN",
                                               "hippocampal" = "HC",
@@ -87,11 +90,6 @@ fsprettify <- function(x,
                                               "caudal" = "c",
                                               "lateral" = "l",
                                               "superior" = "s"))
-    # Check output is unique:
-    if ( length(unique(input)) != length(unique(x)) ) {
-      warning("Shortened labels are not unique. Returning shorten = FALSE")
-      return(input)
-    }
   }
   return(x)
 }

@@ -14,7 +14,7 @@ You can install AJLFreesurferTools from github using the `remotes` package:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("AndewLawrence/AJLFreesurferTools")
+remotes::install_github("AndrewLawrence/AJLFreesurferTools")
 ```
 
 ## Example

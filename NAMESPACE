@@ -2,4 +2,8 @@
 
 export(convert_df_to_qdec)
 export(fmt_atlaslabel)
+export(readstats_subject)
+export(readstats_subjectlist)
+importFrom(stats,setNames)
+importFrom(utils,read.table)
 importFrom(utils,write.table)

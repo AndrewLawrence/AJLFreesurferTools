@@ -8,7 +8,11 @@ Description: Minimal validation, use with caution.
     Should be widely supported as this package has few dependencies.
 License: GPL (>=3)
 Encoding: UTF-8
-Imports: stringr
+Imports: 
+    MASS,
+    stats,
+    stringr,
+    utils
 LazyData: true
 Language: en-GB
 RoxygenNote: 7.2.3

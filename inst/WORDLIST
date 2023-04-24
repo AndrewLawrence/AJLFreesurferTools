@@ -1,3 +1,4 @@
+Bonferroni
 CerebralWhiteMatterVol
 DIR
 DKT
@@ -16,6 +17,7 @@ ROIs
 RegionNames
 Schäfer's
 StructNames
+Talairach
 WIP
 amyg
 aparc
@@ -27,10 +29,12 @@ bool
 dat
 df
 dir
+eTIV
 fmt
 freesurfer
 freesurferformats
 fsbrain
+fsid
 fsroi
 ggseg
 github
@@ -40,11 +44,16 @@ lgi
 lh
 meas
 parcellation
+qc
 qdec
 readstats
 regex
 rh
 roi
+rstudent
+sd
+sds
+studentised
 subjectlist
 tidyverse's
 vars

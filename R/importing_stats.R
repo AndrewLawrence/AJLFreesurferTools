@@ -147,6 +147,7 @@ atlasstats_to_wide <- function(x,
     hemi_label <- ""
     snames <- gsub("^Left-", "lh_", snames)
     snames <- gsub("^Right-", "rh_", snames)
+    snames <- tolower(snames)
 
     snames <- ifelse(substr(snames, 1, 3) %in% c("lh_", "rh_"),
                      snames,

@@ -1,5 +1,39 @@
 # Functions to work with Freesurfer "stats" files
 #   (found in $SUBJECT_DIR/$SUBJECT/stats)
+#
+# Dev notes:
+#   stats files include data for one parcellation (typically a single hemi)
+#     from a single subject. The file has two components:
+#     1) A data body in a table form with multiple values per region in the
+#         parcellation
+#     2) A header, commented out with '#' that contains metadata.
+#
+#   The internal function read_statsdata() reads the main data table
+#
+#   Three internal read_statsheader_XXX functions read different aspects
+#     of the file header:
+#
+#     _colnames = simple vector of colnames (used in read_statsdata).
+#
+#     _measures = table of brain measures from the header, e.g. eTIV.
+#                     (used in read_statsdata)
+#
+#     _tablecols = table of additional details for tabular data (e.g. units)
+#                     (currently unused)
+#
+#   The user-visible (exported) functions:
+#
+#       readstats_subject
+#         -and-
+#       readstats_subjectlist
+#
+#     are used to import a particular parcellation for both hemispheres, and
+#       the subcortical measures from an aseg, into a single row per subject
+#       format.
+#
+#   Functions with the format rss_* are internal supporting functions for the
+#     two readstats_subject* functions.
+#
 
 read_statsheader_colnames <- function(file) {
   x <- readLines(file)

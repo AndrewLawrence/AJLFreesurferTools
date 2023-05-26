@@ -1,6 +1,6 @@
 
 # pow(x,y) used instead of x^y in the logic of the operant column of normstab:
-pow <- function(x,y) {
+pow <- function(x, y) {
   x^y
 }
 
@@ -46,7 +46,7 @@ norm_a_region <- function(value,
     stop(paste0("Error, wrong number of matches for region:", region))
   }
   # filter to selected atlas:
-  normstab <- normstab[normstab$atlas_id == atab$atlas_id,]
+  normstab <- normstab[normstab$atlas_id == atab$atlas_id, ]
 
   modality_manuf_id <- match.arg(modality_manuf_id,
                                  c("Siemens", "Phillips", "GE"))

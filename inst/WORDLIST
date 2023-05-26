@@ -11,6 +11,7 @@ GDAL
 HPC
 MeanThickness
 OFC
+Potvin
 QDEC
 QDEC's
 ROIs
@@ -26,6 +27,7 @@ atlaslabel
 atlasstats
 bl
 bool
+csv
 dat
 df
 dir
@@ -53,8 +55,10 @@ roi
 rstudent
 sd
 sds
+statsdf
 studentised
 subjectlist
+surfacearea
 tidyverse's
 vars
 vol

@@ -66,6 +66,7 @@ general, but they follow some principles:
  * Manipulations required:
      * All StructNames are converted to lower case
      * All StructNames have underscores (\_) converted to hyphens (\-)
+     * All StructNames have periods removed.
  * Exceptions:
      * Hemispheric scope is omitted for certain whole-brain measures, typically
          those from the measures contained in the header of the aseg files.

@@ -36,6 +36,9 @@ whole-brain measures. \code{bl_} indicates a region spanning left and
 right hemispheres.
 }
 \description{
-Apply readstats_subject to a vector of subject IDs and collate into
-a data.frame.
+Apply \code{\link{readstats_subject}} to a vector of subject IDs and collate
+into a data.frame.
+}
+\seealso{
+readstats_subject
 }

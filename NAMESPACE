@@ -3,6 +3,7 @@
 export(convert_df_to_qdec)
 export(fmt_atlaslabel)
 export(norm_a_region)
+export(norm_statsdf)
 export(qc_etiv)
 export(qc_prep)
 export(qc_rstudent)

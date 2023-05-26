@@ -37,9 +37,10 @@ Either 1L (for 1.5T), or 0L (for 3T).}
 \code{c("Siemens","Phillips", "GE")}.}
 
 \item{normstab}{A data.frame of regression coefficients and operations in
-a particular expected format. Default uses internal dkt_norms data.frame
-adapted from the DKT.csv file supplied in the supplementary material of
-Potvin et al 2017.}
+a particular expected format. By default the internal data.frame
+\code{dkt_norms} is used. This was adapted from the DKT.csv file
+supplied in the supplementary material of Potvin et al 2017.
+This only works for the cortical DKT parcellation and aseg regions.}
 }
 \value{
 a single numeric value

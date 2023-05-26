@@ -360,14 +360,15 @@ readstats_subject <- function(s,
 
 #' readstats_subjectlist
 #'
-#' Apply readstats_subject to a vector of subject IDs and collate into
-#'     a data.frame.
+#' Apply \code{\link{readstats_subject}} to a vector of subject IDs and collate
+#'     into a data.frame.
 #' @param s a vector of subject IDs (or labels if using dir_path)
 #' @inheritParams readstats_subject
 #' @return Given *n* subject IDs returns a *n* row data.frame containing stats
 #'     values. Variable names follow hemi_region_measure format unless
 #'     whole-brain measures. `bl_` indicates a region spanning left and
 #'     right hemispheres.
+#' @seealso readstats_subject
 #' @export
 readstats_subjectlist <- function(s,
                                   dir_path = NULL,

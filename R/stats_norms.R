@@ -4,6 +4,12 @@ pow <- function(x, y) {
   x^y
 }
 
+check_magnetic_field_strength <- function(x) {
+  length(x) == 1L & (
+    x == 1L | x == 0L
+  )
+}
+
 #' norm_a_region
 #'
 #' Produce a Z-score for a single freesurfer parcellation measure in a single
@@ -23,9 +29,10 @@ pow <- function(x, y) {
 #' @param modality_manuf_id Name of MRI scanner's manufacturer. One of
 #'     \code{c("Siemens","Phillips", "GE")}.
 #' @param normstab A data.frame of regression coefficients and operations in
-#'     a particular expected format. Default uses internal dkt_norms data.frame
-#'     adapted from the DKT.csv file supplied in the supplementary material of
-#'     Potvin et al 2017.
+#'     a particular expected format. By default the internal data.frame
+#'     \code{dkt_norms} is used. This was adapted from the DKT.csv file
+#'     supplied in the supplementary material of Potvin et al 2017.
+#'     This only works for the cortical DKT parcellation and aseg regions.
 #' @return a single numeric value
 #' @export
 norm_a_region <- function(value,
@@ -93,4 +100,98 @@ norm_a_region <- function(value,
   z <- eval(parse(text = normcmd), envir = env)
 
   return(z)
+}
+
+
+
+#' norm_statsdf
+#'
+#' Produce Z-scores based on Potvin et al 2017's norming procedure for *all*
+#'     freesurfer parcellation measures in a data.frame.
+#'     See \code{\link{norm_a_region}}
+#'     for key arguments. This function infers \code{value} and
+#'     \code{region} from the data.frame column names and contents. It is
+#'     designed to work with the output of \code{\link{readstats_subjectlist}}.
+#'
+#' This function assumes \code{statsdf} contains data from a single scanner,
+#'    and so \code{magnetic_field_strength} and \code{modality_manuf_id} are
+#'    specified once. Other non-region/value data required for norming
+#'    must be included as columns in \code{statsdf}.
+#'    These are: \code{participant_age} (in years),
+#'    \code{gender} (0|1 = Female|Male),
+#'    and \code{eTIV} (in mm^3).
+#' @param statsdf a data.frame (probably derived from
+#'     \code{\link{readstats_subjectlist}}).
+#' @param etiv_colname The column name of the variable containing estimated
+#'     Total Intracranial Volume (mm^3).
+#' @param age_colname The column name of the variable containing participants
+#'     age in years (must be numeric, can be decimal).
+#' @param gender_colname The column name of the variable containing participants
+#'     gender, coded as 0 for Female, and 1 for Male.
+#' @param id_colname The column name#' containing the freesurfer ID.
+#' @return A data.frame of z-scored data. Variable names from \code{statsdf}
+#'     are prefixed by \code{z_}.
+#' @inheritParams norm_a_region
+#' @export
+norm_statsdf <- function(statsdf,
+                         etiv_colname = "etiv",
+                         age_colname = "age",
+                         gender_colname = "gender",
+                         id_colname = "fsid",
+                         magnetic_field_strength = 0L,
+                         modality_manuf_id,
+                         normstab = dkt_norms) {
+  # Check input:
+  if (!"data.frame" %in% class(statsdf)) {
+    stop("statsdf must be a data.frame")
+  }
+
+  for (i in c(etiv_colname, age_colname, gender_colname, id_colname)) {
+    if (!i %in% colnames(statsdf)) {
+      stop(paste0("Column not found in statsdf: ", i))
+    }
+  }
+
+  if (!check_magnetic_field_strength(magnetic_field_strength)) {
+    stop("magnetic_field_strength not specified correctly")
+  }
+
+  modality_manuf_id <-
+    match.arg(modality_manuf_id,
+              choices = c("Siemens", "Phillips", "GE"))
+  # END check input.
+
+  # Identify suitable regions:
+  rois <-
+    colnames(statsdf)[colnames(statsdf) %in% normstab$region]
+
+
+  res <- lapply(
+    setNames(rois, rois),
+    function(roi) {
+      vapply(seq_len(nrow(statsdf)),
+             function(i) {
+               do.call(
+                 what = norm_a_region,
+                 args = list(
+                   value = statsdf[i, roi],
+                   region = roi,
+                   participant_age = statsdf[i, age_colname],
+                   gender = statsdf[i, gender_colname],
+                   eTIV = statsdf[i, etiv_colname],
+                   magnetic_field_strength = magnetic_field_strength,
+                   modality_manuf_id = modality_manuf_id,
+                   normstab = normstab
+                 )
+               )
+             },
+             FUN.VALUE = 42.0)
+    }
+    )
+
+  res <- as.data.frame(res)
+  colnames(res) <- paste0("z_", colnames(res))
+  res <- cbind(tmp = statsdf[, id_colname], res)
+  colnames(res)[1] <- id_colname
+  res
 }

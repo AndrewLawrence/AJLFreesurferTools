@@ -15,6 +15,14 @@ proc_dkt_csv <- function(f) {
   norms <- norms[!grepl("_log$", norms$region), ]
   # TODO: make this work with logs.
 
+  # Improve naming conventions:
+  #   Value instead of Volume
+  norms$name <- gsub("Volume", "Value", norms$name)
+  norms$operant <- gsub("Volume", "Value", norms$operant)
+  norms$operant <- gsub("volume", "value", norms$operant)
+  #   Participant instead of Patient
+  norms$operant <- gsub("patient_age", "participant_age", norms$operant)
+
   # Separate out hemisphere and measure information (init):
   norms$region_hemi <- NA
   norms$region_meas <- NA
@@ -78,4 +86,10 @@ proc_dkt_csv <- function(f) {
 
 dkt_norms <- proc_dkt_csv("data-raw/DKT.csv")
 
-usethis::use_data(dkt_norms, overwrite = TRUE, internal = TRUE)
+
+usethis::use_data(
+  dkt_norms,
+  overwrite = TRUE,
+  internal = TRUE,
+  compress = "bzip2"
+)

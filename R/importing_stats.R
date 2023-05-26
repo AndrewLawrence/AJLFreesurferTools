@@ -108,7 +108,8 @@ read_statsdata <- function(file) {
 
 #' atlasstats_to_wide
 #'
-#' Apply to the results of applying read_stats_data to a cortical atlas
+#' Apply to the results of applying internal \code{read_statsdata} function to a
+#'    cortical atlas.
 #' @param x A named list of 2 data.frames "header" "dat" (from read_stats_data).
 #' @param is_aseg Different behaviour if input is aseg rather than a
 #'     cortical atlas.
@@ -118,10 +119,12 @@ read_statsdata <- function(file) {
 #'     Leave as "" for no prefix.
 #' @return A one row data.frame with ${hemi}_${roi}_${meas} format column names.
 atlasstats_to_wide <- function(x,
-                          is_aseg = FALSE,
-                          is_wm = FALSE,
-                          hemi_label = "") {
+                               is_aseg = FALSE,
+                               is_wm = FALSE,
+                               hemi_label = "") {
   hdr <- x$header
+  names(hdr) <- tolower(names(hdr))
+
   x <- x$data
 
   # Add a delimiter to non-default hemi_label arguments:
@@ -148,6 +151,8 @@ atlasstats_to_wide <- function(x,
     snames <- gsub("^Left-", "lh_", snames)
     snames <- gsub("^Right-", "rh_", snames)
     snames <- tolower(snames)
+    snames <- gsub("\\.", "", snames)
+    snames <- gsub("-", "", snames)
 
     snames <- ifelse(substr(snames, 1, 3) %in% c("lh_", "rh_"),
                      snames,
@@ -156,6 +161,8 @@ atlasstats_to_wide <- function(x,
     # aseg specific header measure treatment:
     names(hdr) <- gsub("^lh", "lh_", names(hdr))
     names(hdr) <- gsub("^rh", "rh_", names(hdr))
+
+    names(hdr) <- gsub("cortexvol", "cortex_volume", names(hdr))
 
     meas <- setNames(c("Volume_mm3"), c("vol"))
   } else {
@@ -167,7 +174,11 @@ atlasstats_to_wide <- function(x,
     #   refer *only* to the hemisphere of that cortical atlas.
     #   Remaining header measures are common / whole head measures
     #     and so are identical between lh.aparc.? and rh.aparc.?
-    names(hdr)[1:3] <- paste0(hemi_label, names(hdr)[1:3])
+    names(hdr)[1:3] <- paste0(hemi_label, tolower(names(hdr)[1:3]))
+    # We want to change a couple of these names
+    #     to keep a standard naming scheme:
+    names(hdr) <- gsub("whitesurfarea", "cortex_area", names(hdr))
+    names(hdr) <- gsub("meanthickness", "cortex_thickness", names(hdr))
   }
   result <- hdr
   for ( i in seq_along(meas) ) {

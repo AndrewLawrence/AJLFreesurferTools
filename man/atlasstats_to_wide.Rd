@@ -22,5 +22,6 @@ Leave as "" for no prefix.}
 A one row data.frame with ${hemi}\emph{${roi}}${meas} format column names.
 }
 \description{
-Apply to the results of applying read_stats_data to a cortical atlas
+Apply to the results of applying internal \code{read_statsdata} function to a
+cortical atlas.
 }

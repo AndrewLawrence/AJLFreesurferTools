@@ -187,7 +187,7 @@ norm_statsdf <- function(statsdf,
              },
              FUN.VALUE = 42.0)
     }
-    )
+  )
 
   res <- as.data.frame(res)
   colnames(res) <- paste0("z_", colnames(res))

@@ -4,7 +4,7 @@
 \alias{qc_etiv}
 \title{qc_eTIV}
 \usage{
-qc_etiv(x, etiv_lab = "eTIV")
+qc_etiv(x, etiv_lab = "etiv")
 }
 \arguments{
 \item{x}{A data.frame of Freesurfer stats with rownames set to fsid.

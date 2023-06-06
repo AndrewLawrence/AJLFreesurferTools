@@ -4,7 +4,7 @@
 \alias{qc_rstudent}
 \title{qc_rstudent}
 \usage{
-qc_rstudent(x, etiv_lab = "eTIV")
+qc_rstudent(x, etiv_lab = "etiv")
 }
 \arguments{
 \item{x}{A data.frame of Freesurfer measures with fsid in the rownames.}

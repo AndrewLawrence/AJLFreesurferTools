@@ -65,7 +65,7 @@ qc_prep <- function(x, trim = 0.2) {
 #' @importFrom stats as.formula p.adjust quantile sd
 #' @importFrom utils head globalVariables
 #' @export
-qc_etiv <- function(x, etiv_lab = "eTIV") {
+qc_etiv <- function(x, etiv_lab = "etiv") {
   f <- stats::as.formula(paste0(etiv_lab, " ~ 1"))
   # extract studentised residuals:
   m <- stats::lm(f, data = x)
@@ -98,7 +98,7 @@ qc_etiv <- function(x, etiv_lab = "eTIV") {
 #' @importFrom MASS rlm
 #' @importFrom stats sd
 #' @export
-qc_rstudent <- function(x, etiv_lab = "eTIV") {
+qc_rstudent <- function(x, etiv_lab = "etiv") {
   nm <- colnames(x)
   nm <- nm[nm != etiv_lab]
 

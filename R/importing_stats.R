@@ -50,8 +50,7 @@ read_statsheader_measures <- function(file,
   # header lines start with "# ":
   sel <- grep("^# Measure", x)
   if ( length(sel) == 0L ) {
-    warning("no measures found")
-    return(NULL)
+    return(NA)
   }
   x <- x[sel]
   x <- gsub("# Measure ", "", x)
@@ -115,15 +114,21 @@ read_statsdata <- function(file) {
 #'     cortical atlas.
 #' @param is_wm Different behaviour if input is a wm.aparc.stats rather than a
 #'     cortical atlas.
+#' @param is_lgi Different behaviour if input is an lgi stats file rather than
+#'     a cortical atlas.
 #' @param hemi_label A prefix for the output names (e.g. "lh", "rh", "bl").
 #'     Leave as "" for no prefix.
 #' @return A one row data.frame with ${hemi}_${roi}_${meas} format column names.
 atlasstats_to_wide <- function(x,
                                is_aseg = FALSE,
                                is_wm = FALSE,
+                               is_lgi = FALSE,
                                hemi_label = "") {
+
   hdr <- x$header
-  names(hdr) <- tolower(names(hdr))
+  if ( ! is_lgi ) {
+    names(hdr) <- tolower(names(hdr))
+  }
 
   x <- x$data
 
@@ -146,7 +151,6 @@ atlasstats_to_wide <- function(x,
 
   if ( is_aseg ) {
     # aseg specific set-up:
-
     hemi_label <- ""
     snames <- gsub("^Left-", "lh_", snames)
     snames <- gsub("^Right-", "rh_", snames)
@@ -166,24 +170,35 @@ atlasstats_to_wide <- function(x,
 
     meas <- setNames(c("Volume_mm3"), c("vol"))
   } else {
-    # cortical specific setup:
-    meas <- setNames(c("SurfArea", "ThickAvg", "GrayVol"),
-                     c("area", "thickness", "volume"))
-    # For cortical surface segmentations the first three elements of the header:
-    #   NumVert, WhiteSurfArea, and MeanThickness
-    #   refer *only* to the hemisphere of that cortical atlas.
-    #   Remaining header measures are common / whole head measures
-    #     and so are identical between lh.aparc.? and rh.aparc.?
-    names(hdr)[1:3] <- paste0(hemi_label, tolower(names(hdr)[1:3]))
-    # We want to change a couple of these names
-    #     to keep a standard naming scheme:
-    names(hdr) <- gsub("whitesurfarea", "cortex_area", names(hdr))
-    names(hdr) <- gsub("meanthickness", "cortex_thickness", names(hdr))
+
+    if ( is_lgi ) {
+      meas <- setNames(c("Mean"), c("lgi"))
+    } else {
+      # cortical specific setup:
+      meas <- setNames(c("SurfArea", "ThickAvg", "GrayVol"),
+                       c("area", "thickness", "volume"))
+      # For cortical surface segmentations the first three elements of the header:
+      #   NumVert, WhiteSurfArea, and MeanThickness
+      #   refer *only* to the hemisphere of that cortical atlas.
+      #   Remaining header measures are common / whole head measures
+      #     and so are identical between lh.aparc.? and rh.aparc.?
+      names(hdr)[1:3] <- paste0(hemi_label, tolower(names(hdr)[1:3]))
+      # We want to change a couple of these names
+      #     to keep a standard naming scheme:
+      names(hdr) <- gsub("whitesurfarea", "cortex_area", names(hdr))
+      names(hdr) <- gsub("meanthickness", "cortex_thickness", names(hdr))
+    }
+
   }
-  result <- hdr
+
+  if ( ! is_lgi ) {
+    result <- hdr
+  } else {
+    result <- NULL
+  }
+
   for ( i in seq_along(meas) ) {
     nm <- paste0(hemi_label, snames, "_", names(meas)[[i]])
-
     result <- c(result, setNames(x[, meas[[i]]], nm))
   }
   result
@@ -268,8 +283,13 @@ rss_validate_files <- function(x) {
 #'     Uses default naming convention for freesurfer to identify the requested
 #'     atlas files and the aseg (if requested).
 #'     Does not import wm.aparc as this is often not of interest and
-#'     in a default setting is only generated for the regions of the Desikan
+#'     (by default settings) is only generated for the regions of the Desikan
 #'     atlas.
+#'
+#' If requested (lgi = TRUE) then LGI files will be searched for with the
+#'     naming convention: $hemi.$atlas.pial_lgi.stats
+#'     in the subject/stats folder.
+#'     e.g. lh.aparc.DKTatlas.pial_lgi.stats
 #'
 #' @return A one row data.frame containing stats values. Variable names follow
 #'     hemi_region_measure format unless whole-brain measures. `bl_` indicates
@@ -284,6 +304,7 @@ rss_validate_files <- function(x) {
 #'     SUBJECTS_DIR is ignored if `dir_path` is set.
 #' @param atlas Which cortical parcellation atlas to read.
 #' @param hemi Which hemisphere(s) to export stats from.
+#' @param lgi bool. TRUE: look for additional lgi files for the specified atlas.
 #' @param read_aseg bool. Read aseg stats as well as cortical data?
 #' @examples
 #' # If SUBJECTS_DIR is set as a system variable:
@@ -305,6 +326,7 @@ readstats_subject <- function(s,
                               SUBJECTS_DIR = NULL, #nolint
                               atlas = c("DKT", "Desikan", "Destrieux"),
                               hemi = c("both", "lh", "rh"),
+                              lgi = TRUE,
                               read_aseg = TRUE) {
   cl <- as.list(match.call())[-1]
 
@@ -355,7 +377,31 @@ readstats_subject <- function(s,
   #   add the subject id as the first column:
   fdat <- do.call(data.frame, c(list(fsid = s), as.list(fdat)))
 
-  fdat
+  # lgi handling:
+  if ( !lgi ) return(fdat)
+
+  # Look for lgi files with expected names:
+  lgi_alut <- c(DKT = "aparc.DKTatlas.pial_lgi.stats",
+                Desikan = "aparc.pial_lgi.stats",
+                Destrieux = "aparc.a2009s.pial_lgi.stats")
+
+  flist <- setNames(paste0(fpath, "/", hemi, ".", lgi_alut[atlas]), hemi)
+  # filter to exisiting files and if non return:
+  flist <- flist[file.exists(flist)]
+  if ( length(flist) < 1 ) return(fdat)
+
+  # Otherwise read in and append lgi data:
+  lgi <- do.call(rss_merge_unique,
+                 unname(mapply(
+                   \(f, lab) atlasstats_to_wide(read_statsdata(f),
+                                                is_lgi = TRUE,
+                                                hemi_label = lab),
+                   flist,
+                   names(flist),
+                   SIMPLIFY = FALSE
+                 )))
+
+  do.call(data.frame, rss_merge_unique_two(fdat, lgi))
 }
 
 #' readstats_subjectlist
@@ -375,6 +421,7 @@ readstats_subjectlist <- function(s,
                                   SUBJECTS_DIR = NULL, #nolint
                                   atlas = c("DKT", "Desikan", "Destrieux"),
                                   hemi = c("both", "lh", "rh"),
+                                  lgi = TRUE,
                                   read_aseg = TRUE) {
   cl <- as.list(match.call())[-1]
   cl$s <- NULL

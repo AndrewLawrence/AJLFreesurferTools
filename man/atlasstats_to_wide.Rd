@@ -4,7 +4,13 @@
 \alias{atlasstats_to_wide}
 \title{atlasstats_to_wide}
 \usage{
-atlasstats_to_wide(x, is_aseg = FALSE, is_wm = FALSE, hemi_label = "")
+atlasstats_to_wide(
+  x,
+  is_aseg = FALSE,
+  is_wm = FALSE,
+  is_lgi = FALSE,
+  hemi_label = ""
+)
 }
 \arguments{
 \item{x}{A named list of 2 data.frames "header" "dat" (from read_stats_data).}
@@ -14,6 +20,9 @@ cortical atlas.}
 
 \item{is_wm}{Different behaviour if input is a wm.aparc.stats rather than a
 cortical atlas.}
+
+\item{is_lgi}{Different behaviour if input is an lgi stats file rather than
+a cortical atlas.}
 
 \item{hemi_label}{A prefix for the output names (e.g. "lh", "rh", "bl").
 Leave as "" for no prefix.}

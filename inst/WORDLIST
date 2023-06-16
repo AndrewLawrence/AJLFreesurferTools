@@ -2,6 +2,7 @@ Bonferroni
 CerebralWhiteMatterVol
 DIR
 DKT
+DKTatlas
 DODS
 Desikan
 Freesurfer
@@ -9,6 +10,7 @@ Freesurfer's
 FreesurferColorLUT
 GDAL
 HPC
+LGI
 MeanThickness
 OFC
 Potvin
@@ -46,6 +48,7 @@ lgi
 lh
 meas
 parcellation
+pial
 qc
 qdec
 readstats

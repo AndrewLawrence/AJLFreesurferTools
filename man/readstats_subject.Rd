@@ -10,6 +10,7 @@ readstats_subject(
   SUBJECTS_DIR = NULL,
   atlas = c("DKT", "Desikan", "Destrieux"),
   hemi = c("both", "lh", "rh"),
+  lgi = TRUE,
   read_aseg = TRUE
 )
 }
@@ -29,6 +30,8 @@ SUBJECTS_DIR is ignored if \code{dir_path} is set.}
 
 \item{hemi}{Which hemisphere(s) to export stats from.}
 
+\item{lgi}{bool. TRUE: look for additional lgi files for the specified atlas.}
+
 \item{read_aseg}{bool. Read aseg stats as well as cortical data?}
 }
 \value{
@@ -41,8 +44,14 @@ Read in a cortical atlas for a subject.
 Uses default naming convention for freesurfer to identify the requested
 atlas files and the aseg (if requested).
 Does not import wm.aparc as this is often not of interest and
-in a default setting is only generated for the regions of the Desikan
+(by default settings) is only generated for the regions of the Desikan
 atlas.
+}
+\details{
+If requested (lgi = TRUE) then LGI files will be searched for with the
+naming convention: $hemi.$atlas.pial_lgi.stats
+in the subject/stats folder.
+e.g. lh.aparc.DKTatlas.pial_lgi.stats
 }
 \examples{
 # If SUBJECTS_DIR is set as a system variable:

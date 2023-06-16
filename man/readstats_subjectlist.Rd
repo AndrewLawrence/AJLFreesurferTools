@@ -10,6 +10,7 @@ readstats_subjectlist(
   SUBJECTS_DIR = NULL,
   atlas = c("DKT", "Desikan", "Destrieux"),
   hemi = c("both", "lh", "rh"),
+  lgi = TRUE,
   read_aseg = TRUE
 )
 }
@@ -26,6 +27,8 @@ SUBJECTS_DIR is ignored if \code{dir_path} is set.}
 \item{atlas}{Which cortical parcellation atlas to read.}
 
 \item{hemi}{Which hemisphere(s) to export stats from.}
+
+\item{lgi}{bool. TRUE: look for additional lgi files for the specified atlas.}
 
 \item{read_aseg}{bool. Read aseg stats as well as cortical data?}
 }

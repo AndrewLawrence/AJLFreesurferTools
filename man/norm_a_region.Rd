@@ -47,5 +47,12 @@ a single numeric value
 }
 \description{
 Produce a Z-score for a single freesurfer parcellation measure in a single
-subject. Norms are based on Potvin et al 2017.
+subject. Norms and calculations are taken from Potvin et al 2017.
 }
+\section{Age Range}{
+
+The normative data came from male and female subjects aged 18-94,
+do not expect usable results for participants much under 18 (or over 94)
+as these are extrapolated outside the observed range.
+}
+

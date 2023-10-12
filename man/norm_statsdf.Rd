@@ -80,3 +80,10 @@ There are currently no functions in this package to handle missing data
 or collate results over imputations.
 }
 
+\section{Age Range}{
+
+The normative data came from male and female subjects aged 18-94,
+do not expect usable results for participants much under 18 (or over 94)
+as these are extrapolated outside the observed range.
+}
+

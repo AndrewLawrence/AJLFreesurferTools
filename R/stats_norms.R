@@ -11,7 +11,12 @@ check_magnetic_field_strength <- function(x) {
 #' norm_a_region
 #'
 #' Produce a Z-score for a single freesurfer parcellation measure in a single
-#'     subject. Norms are based on Potvin et al 2017.
+#'     subject. Norms and calculations are taken from Potvin et al 2017.
+#'
+#' @section Age Range:
+#' The normative data came from male and female subjects aged 18-94,
+#'     do not expect usable results for participants much under 18 (or over 94)
+#'     as these are extrapolated outside the observed range.
 #'
 #' @param value The value of an observed quantity (e.g. thickness, surfacearea)
 #'     in a particular region.
@@ -148,6 +153,7 @@ norm_a_region <- function(value,
 #' @return A data.frame of z-scored data. Variable names from \code{statsdf}
 #'     are prefixed by \code{z_}.
 #' @inheritParams norm_a_region
+#' @inheritSection norm_a_region Age Range
 #' @importFrom stats complete.cases
 #' @export
 norm_statsdf <- function(statsdf,

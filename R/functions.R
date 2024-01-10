@@ -39,9 +39,9 @@ flat_writer <- function(x, file, col_names = FALSE, row_names = FALSE, ...) {
 #' @return a character vector
 #' @export
 fmt_atlaslabel <- function(x,
-                       remove_hemi = FALSE,
-                       remove_measure = TRUE,
-                       shorten = TRUE) {
+                           remove_hemi = FALSE,
+                           remove_measure = TRUE,
+                           shorten = TRUE) {
   x <- tolower(as.character(x)) # coerce lowercase:
 
   if ( remove_measure ) {

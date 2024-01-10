@@ -177,7 +177,8 @@ atlasstats_to_wide <- function(x,
       # cortical specific setup:
       meas <- setNames(c("SurfArea", "ThickAvg", "GrayVol"),
                        c("area", "thickness", "volume"))
-      # For cortical surface segmentations the first three elements of the header:
+      # For cortical surface segmentations,
+      #   the first three elements of the header:
       #   NumVert, WhiteSurfArea, and MeanThickness
       #   refer *only* to the hemisphere of that cortical atlas.
       #   Remaining header measures are common / whole head measures
@@ -358,14 +359,15 @@ readstats_subject <- function(s,
     rss_validate_files(flist)
   }
 
+
   fdat <- do.call(rss_merge_unique,
-                  unname(mapply(
-                    \(f, lab) atlasstats_to_wide(read_statsdata(f),
-                                                 hemi_label = lab),
-                    flist,
-                    names(flist),
-                    SIMPLIFY = FALSE
-                  )))
+                  unname(mapply(\(f, lab) {
+                    atlasstats_to_wide(read_statsdata(f),
+                                       hemi_label = lab)
+                  },
+                  flist,
+                  names(flist),
+                  SIMPLIFY = FALSE)))
 
   if ( read_aseg ) {
     fdat <- rss_merge_unique_two(
@@ -392,14 +394,14 @@ readstats_subject <- function(s,
 
   # Otherwise read in and append lgi data:
   lgi <- do.call(rss_merge_unique,
-                 unname(mapply(
-                   \(f, lab) atlasstats_to_wide(read_statsdata(f),
-                                                is_lgi = TRUE,
-                                                hemi_label = lab),
-                   flist,
-                   names(flist),
-                   SIMPLIFY = FALSE
-                 )))
+                 unname(mapply(\(f, lab) {
+                   atlasstats_to_wide(read_statsdata(f),
+                                      is_lgi = TRUE,
+                                      hemi_label = lab)
+                 },
+                 flist,
+                 names(flist),
+                 SIMPLIFY = FALSE)))
 
   do.call(data.frame, rss_merge_unique_two(fdat, lgi))
 }
@@ -432,13 +434,13 @@ readstats_subjectlist <- function(s,
     if ( length(dir_path) != length(s) )
       stop("labels (s) and dir_paths must be same length")
 
-    rlist <- mapply(
-      \(subj, dir) do.call("readstats_subject",
-                           c(list(s = subj, dir_path = dir), cl)),
-      s,
-      dir_path,
-      SIMPLIFY = FALSE
-    )
+    rlist <- mapply(\(subj, dir) {
+      do.call("readstats_subject",
+              c(list(s = subj, dir_path = dir), cl))
+    },
+    s,
+    dir_path,
+    SIMPLIFY = FALSE)
   } else {
     rlist <- lapply(s,
                     \(subj) do.call("readstats_subject", c(list(s = subj), cl)))

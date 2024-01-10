@@ -39,14 +39,18 @@ check_magnetic_field_strength <- function(x) {
 #' @return a single numeric value
 #' @export
 norm_a_region <- function(value,
-                          region, # character, from normstab region column.
+                          region,
+                          # character, from normstab region column.
                           participant_age,
-                          gender, # 1 = Male, 0 = Female
-                          eTIV,   # mm3, i.e. should have 7 digits # nolint
-                          magnetic_field_strength = 0L, # 1 = 1.5T, 0 = 3T
-                          modality_manuf_id, # "Siemens","Phillips", "GE"
-                          normstab = dkt_norms # in data-raw/dkt_norms.R
-) {
+                          gender,
+                          # 1 = Male, 0 = Female
+                          eTIV, #nolint
+                          # mm3, i.e. should have 7 digits # nolint
+                          magnetic_field_strength = 0L,
+                          # 1 = 1.5T, 0 = 3T
+                          modality_manuf_id,
+                          # "Siemens","Phillips", "GE"
+                          normstab = dkt_norms) { # in data-raw/dkt_norms.R)
 
   # infer atlas from region:
   sel <- which(normstab$region == region)

@@ -23,13 +23,16 @@ flat_writer <- function(x, file, col_names = FALSE, row_names = FALSE, ...) {
 
 #' fmt_atlaslabel
 #'
-#' Common manipulations for atlas labels: remove hemisphere,
-#' remove measure, shorten labels.
+#' Common manipulations for freesurfer atlas labels: forces lower case then
+#' optionally removes hemisphere, removes measure and shortens labels with
+#' common abbreviations.
 #'
-#' This is a WIP developed using the DKT atlas. Note: this will not check if
-#' the result has as many unique levels as the input. If using this function,
-#' (particularly with the shorten option) verify it hasn't accidentally
-#' collapsed levels.
+#' This is a WIP developed/tested with the DKT atlas.
+#'
+#' This function does not check that the result has as many unique levels as the
+#' input (sometimes this is the desired behaviour). When using this function,
+#' (particularly with the shorten option) verify it hasn't collapsed levels
+#' in a way you were not expecting.
 #'
 #' @param x object coercible to character
 #' @param remove_hemi strip hemisphere from start ^lh_|^rh_
@@ -44,55 +47,61 @@ fmt_atlaslabel <- function(x,
                            shorten = TRUE) {
   x <- tolower(as.character(x)) # coerce lowercase:
 
-  if ( remove_measure ) {
+  if (remove_measure) {
     x <- gsub("_lgi$|_vol$|_thickness$|_area$", "", x)
   }
-  if ( remove_hemi ) {
+  if (remove_hemi) {
     x <- gsub("^lh_|^rh_", "", x)
   }
-  if ( shorten ) {
+  if (shorten) {
     # pattern gets less specific, so specific cases handled first.
-    x <- stringr::str_replace_all(string = x,
-                                  pattern = c("cuneus" = "CUN",
-                                              "hippocampal" = "HC",
-                                              "hippocampus" = "HC",
-                                              "caudate" = "CAUD",
-                                              "insula" = "INS",
-                                              "thalamusproper" = "THAL",
-                                              "entorhinal" = "EC",
-                                              "pallidum" = "PALL",
-                                              "amygdala" = "AMYG",
-                                              "putamen" = "PUTA",
-                                              "accumbens" = "NA",
-                                              "fusiform" = "FFG",
-                                              "lingual" = "MOG",
-                                              "posteriorcingulate" = "PCC",
-                                              "anteriorcingulate" = "ACC",
-                                              "isthmuscingulate" = "ICC",
-                                              "middlefrontal" = "MFG",
-                                              "orbitofrontal" = "OFC",
-                                              "transversetemporal" = "TTG",
-                                              "supramarginal" = "SMG",
-                                              "superiorfrontal" = "SFG",
-                                              "superiortemporal" = "STG",
-                                              "superiorparietal" = "SPG",
-                                              "middletemporal" = "MTG",
-                                              "inferiortemporal" = "ITG",
-                                              "inferiorparietal" = "IPG",
-                                              "lateraloccipital" = "LOG",
-                                              "parsopercularis" = "IFGoper",
-                                              "parstriangularis" = "IFGtri",
-                                              "parsorbitalis" = "IFGorb",
-                                              "central" = "CEN",
-                                              "calcarine" = "CAL",
-                                              "rostral" = "r",
-                                              "medial" = "m",
-                                              "caudal" = "c",
-                                              "lateral" = "l",
-                                              "superior" = "s"))
+    ptn <- c(
+      "cuneus" = "CUN",
+      "hippocampal" = "HC",
+      "hippocampus" = "HC",
+      "caudate" = "CAUD",
+      "insula" = "INS",
+      "thalamusproper" = "THAL",
+      "entorhinal" = "EC",
+      "pallidum" = "PALL",
+      "amygdala" = "AMYG",
+      "putamen" = "PUTA",
+      "accumbens" = "NA",
+      "fusiform" = "FFG",
+      "lingual" = "MOG",
+      "posteriorcingulate" = "PCC",
+      "anteriorcingulate" = "ACC",
+      "isthmuscingulate" = "ICC",
+      "middlefrontal" = "MFG",
+      "orbitofrontal" = "OFC",
+      "transversetemporal" = "TTG",
+      "supramarginal" = "SMG",
+      "superiorfrontal" = "SFG",
+      "superiortemporal" = "STG",
+      "superiorparietal" = "SPG",
+      "middletemporal" = "MTG",
+      "inferiortemporal" = "ITG",
+      "inferiorparietal" = "IPG",
+      "lateraloccipital" = "LOG",
+      "parsopercularis" = "IFGoper",
+      "parstriangularis" = "IFGtri",
+      "parsorbitalis" = "IFGorb",
+      "central" = "CEN",
+      "calcarine" = "CAL",
+      "rostral" = "r",
+      "medial" = "m",
+      "caudal" = "c",
+      "lateral" = "l",
+      "superior" = "s"
+    )
+
+    for (i in seq_along(ptn)) {
+      x <- gsub(names(ptn)[i], ptn[i], x)
+    }
   }
   return(x)
 }
+
 
 #' convert_df_to_qdec
 #'

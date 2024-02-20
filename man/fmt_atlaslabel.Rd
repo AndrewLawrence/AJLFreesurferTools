@@ -20,12 +20,15 @@ e.g. amyg = amygdala, OFC = orbitofrontal, medial = m}
 a character vector
 }
 \description{
-Common manipulations for atlas labels: remove hemisphere,
-remove measure, shorten labels.
+Common manipulations for freesurfer atlas labels: forces lower case then
+optionally removes hemisphere, removes measure and shortens labels with
+common abbreviations.
 }
 \details{
-This is a WIP developed using the DKT atlas. Note: this will not check if
-the result has as many unique levels as the input. If using this function,
-(particularly with the shorten option) verify it hasn't accidentally
-collapsed levels.
+This is a WIP developed/tested with the DKT atlas.
+
+This function does not check that the result has as many unique levels as the
+input (sometimes this is the desired behaviour). When using this function,
+(particularly with the shorten option) verify it hasn't collapsed levels
+in a way you were not expecting.
 }

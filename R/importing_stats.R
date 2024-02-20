@@ -241,11 +241,7 @@ rss_validate_args <- function(s,
                               read_aseg = TRUE) {
 
   if ( is.null(dir_path) && is.null(SUBJECTS_DIR) ) {
-    SUBJECTS_DIR <- Sys.getenv("SUBJECTS_DIR") #nolint
-    if ( SUBJECTS_DIR == "" ) {
-      stop("SUBJECTS_DIR system variable not set.
-           Specify SUBJECTS_DIR or dir_path")
-    }
+    SUBJECTS_DIR <- get_SUBJECTS_DIR() #nolint
   }
 
   if ( length(s) > 1 ) stop("Only one subject at a time.")
@@ -301,7 +297,6 @@ rss_validate_files <- function(x) {
 #' @param dir_path Specify a path to a particular Freesurfer stats folder
 #'     (e.g. "/data/study/fs/S01/stats")
 #' @param SUBJECTS_DIR Specify the Freesurfer SUBJECTS_DIR directory.
-#'     If `NULL` R will try to read the environmental variable.
 #'     SUBJECTS_DIR is ignored if `dir_path` is set.
 #' @param atlas Which cortical parcellation atlas to read.
 #' @param hemi Which hemisphere(s) to export stats from.
@@ -324,7 +319,7 @@ rss_validate_files <- function(x) {
 #' @export
 readstats_subject <- function(s,
                               dir_path = NULL,
-                              SUBJECTS_DIR = NULL, #nolint
+                              SUBJECTS_DIR = get_SUBJECTS_DIR(), #nolint
                               atlas = c("DKT", "Desikan", "Destrieux"),
                               hemi = c("both", "lh", "rh"),
                               lgi = TRUE,
@@ -408,19 +403,42 @@ readstats_subject <- function(s,
 
 #' readstats_subjectlist
 #'
-#' Apply \code{\link{readstats_subject}} to a vector of subject IDs and collate
-#'     into a data.frame.
-#' @param s a vector of subject IDs (or labels if using dir_path)
+#' Apply \code{\link{readstats_subject}} to **lots** of subject IDs and collate
+#'    into a data.frame.
+#'    Has two modes of operation: `SUBJECTS_DIR` and `dir_path`.
+#'    `dir_path` is a list of direct paths to freesurfer subject folders, it is
+#'    paired with the vector `s` which is used to label the subjects in
+#'    `dir_path`.
+#'    `SUBJECTS_DIR` is a directory containing all your subject folders, if
+#'    this is set then `s` is a vector of subjects that exist within this
+#'    directory.
+#'    *Use `dir_path` if you don't have a typical freesurfer setup.
+#'    If all subjects are in a single directory use `SUBJECTS_DIR`.*
+#'
+#' @param dir_path a vector of full paths to freesurfer directories
+#' @param s a vector of subject IDs for subjects in `SUBJECTS_DIR`
+#'     (alternatively labels for subjects if using `dir_path`).
+#'     Default `s` will use \code{\link{list_fs_subjects}} to read all
+#'     valid freesurfer subjects from `SUBJECTS_DIR` environment variable.
 #' @inheritParams readstats_subject
 #' @return Given *n* subject IDs returns a *n* row data.frame containing stats
 #'     values. Variable names follow hemi_region_measure format unless
 #'     whole-brain measures. `bl_` indicates a region spanning left and
 #'     right hemispheres.
+#' @examples
+#' \dontrun{
+#' ## SUBJECTS_DIR mode:
+#' readstats_subjectlist(s = c("s1", "s2", "s3"),
+#' SUBJECTS_DIR = "/path/to/SUBJECTS")
+#' ## dir_path mode:
+#' readstats_subjectlist(s = c("s1", "s2", "s3"),
+#' dir_path = c("path/to/s1", "path/to/s2", "path/to/s3"))
+#' }
 #' @seealso readstats_subject
 #' @export
-readstats_subjectlist <- function(s,
+readstats_subjectlist <- function(s = list_fs_subjects(),
                                   dir_path = NULL,
-                                  SUBJECTS_DIR = NULL, #nolint
+                                  SUBJECTS_DIR = get_SUBJECTS_DIR(), #nolint
                                   atlas = c("DKT", "Desikan", "Destrieux"),
                                   hemi = c("both", "lh", "rh"),
                                   lgi = TRUE,
@@ -428,6 +446,8 @@ readstats_subjectlist <- function(s,
   cl <- as.list(match.call())[-1]
   cl$s <- NULL
   cl$dir_path <- NULL
+
+  cat("reading stats for: ", length(s), " subjects\n")
 
   if ( !is.null(dir_path) ) {
 

@@ -5,9 +5,9 @@
 \title{readstats_subjectlist}
 \usage{
 readstats_subjectlist(
-  s,
+  s = list_fs_subjects(),
   dir_path = NULL,
-  SUBJECTS_DIR = NULL,
+  SUBJECTS_DIR = get_SUBJECTS_DIR(),
   atlas = c("DKT", "Desikan", "Destrieux"),
   hemi = c("both", "lh", "rh"),
   lgi = TRUE,
@@ -15,13 +15,14 @@ readstats_subjectlist(
 )
 }
 \arguments{
-\item{s}{a vector of subject IDs (or labels if using dir_path)}
+\item{s}{a vector of subject IDs for subjects in \code{SUBJECTS_DIR}
+(alternatively labels for subjects if using \code{dir_path}).
+Default \code{s} will use \code{\link{list_fs_subjects}} to read all
+valid freesurfer subjects from \code{SUBJECTS_DIR} environment variable.}
 
-\item{dir_path}{Specify a path to a particular Freesurfer stats folder
-(e.g. "/data/study/fs/S01/stats")}
+\item{dir_path}{a vector of full paths to freesurfer directories}
 
 \item{SUBJECTS_DIR}{Specify the Freesurfer SUBJECTS_DIR directory.
-If \code{NULL} R will try to read the environmental variable.
 SUBJECTS_DIR is ignored if \code{dir_path} is set.}
 
 \item{atlas}{Which cortical parcellation atlas to read.}
@@ -39,8 +40,27 @@ whole-brain measures. \code{bl_} indicates a region spanning left and
 right hemispheres.
 }
 \description{
-Apply \code{\link{readstats_subject}} to a vector of subject IDs and collate
+Apply \code{\link{readstats_subject}} to \strong{lots} of subject IDs and collate
 into a data.frame.
+Has two modes of operation: \code{SUBJECTS_DIR} and \code{dir_path}.
+\code{dir_path} is a list of direct paths to freesurfer subject folders, it is
+paired with the vector \code{s} which is used to label the subjects in
+\code{dir_path}.
+\code{SUBJECTS_DIR} is a directory containing all your subject folders, if
+this is set then \code{s} is a vector of subjects that exist within this
+directory.
+\emph{Use \code{dir_path} if you don't have a typical freesurfer setup.
+If all subjects are in a single directory use \code{SUBJECTS_DIR}.}
+}
+\examples{
+\dontrun{
+## SUBJECTS_DIR mode:
+readstats_subjectlist(s = c("s1", "s2", "s3"),
+SUBJECTS_DIR = "/path/to/SUBJECTS")
+## dir_path mode:
+readstats_subjectlist(s = c("s1", "s2", "s3"),
+dir_path = c("path/to/s1", "path/to/s2", "path/to/s3"))
+}
 }
 \seealso{
 readstats_subject

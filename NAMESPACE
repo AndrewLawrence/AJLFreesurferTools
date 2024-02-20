@@ -2,6 +2,7 @@
 
 export(convert_df_to_qdec)
 export(fmt_atlaslabel)
+export(list_fs_subjects)
 export(norm_a_region)
 export(norm_statsdf)
 export(qc_etiv)

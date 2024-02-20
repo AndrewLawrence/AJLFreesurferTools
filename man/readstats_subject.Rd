@@ -7,7 +7,7 @@
 readstats_subject(
   s,
   dir_path = NULL,
-  SUBJECTS_DIR = NULL,
+  SUBJECTS_DIR = get_SUBJECTS_DIR(),
   atlas = c("DKT", "Desikan", "Destrieux"),
   hemi = c("both", "lh", "rh"),
   lgi = TRUE,
@@ -23,7 +23,6 @@ searched for the subject \code{s}.}
 (e.g. "/data/study/fs/S01/stats")}
 
 \item{SUBJECTS_DIR}{Specify the Freesurfer SUBJECTS_DIR directory.
-If \code{NULL} R will try to read the environmental variable.
 SUBJECTS_DIR is ignored if \code{dir_path} is set.}
 
 \item{atlas}{Which cortical parcellation atlas to read.}

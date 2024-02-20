@@ -1,7 +1,4 @@
 
-
-
-
 # Function for writing a 'flat', newline-terminated, tab-separated, text file.
 #   Ready to open with unix:
 #' @importFrom utils write.table

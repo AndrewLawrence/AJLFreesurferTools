@@ -37,8 +37,10 @@ eTIV
 fmt
 freesurfer
 freesurferformats
+fsaverage
 fsbrain
 fsid
+fsids
 fsroi
 ggseg
 github
@@ -52,6 +54,7 @@ pial
 qc
 qdec
 readstats
+recon
 regex
 rh
 roi

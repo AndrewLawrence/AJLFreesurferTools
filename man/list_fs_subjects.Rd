@@ -6,37 +6,79 @@
 \usage{
 list_fs_subjects(
   SUBJECTS_DIR = get_SUBJECTS_DIR(),
-  type = c("all", "cross", "long", "template"),
+  type = c("all", "cross", "long", "base"),
   detailed = FALSE,
-  include_longtemplates = "auto"
+  only_done = TRUE,
+  include_base = "auto",
+  include_fsaverage = FALSE
 )
 }
 \arguments{
-\item{SUBJECTS_DIR}{The directory to search. If \code{NULL}, function will attempt
-to read the environment variable \verb{$\{SUBJECTS_DIR\}}.}
+\item{SUBJECTS_DIR}{The directory to search. If \code{NULL}, the function will
+attempt to read the environment variable: \verb{$\{SUBJECTS_DIR\}}.}
 
-\item{type}{What types of subject directories to return:\tabular{ll}{
-   type \tab details \cr
-   cross \tab cross-sectional subjects \cr
-   long \tab longitudinal subjects \cr
-   template \tab mid-space templates from longitudinal runs \cr
+\item{type}{Should output be a particular processing type to return:\tabular{ll}{
+   cross \tab cross-sectional processed data \cr
+   long \tab longitudinal processed data \cr
+   base \tab mid-space ("base") templates from longitudinal processing \cr
    all \tab all the above \cr
 }}
 
 \item{detailed}{Logical. If \code{TRUE} return a data.frame with participant
 id, directory path, and subject type information.}
 
-\item{include_longtemplates}{The default behaviour (\code{"auto"}) is that
+\item{only_done}{Logical. If \code{TRUE} directories without a recon-all.done file
+are omitted}
+
+\item{include_base}{The default behaviour (\code{"auto"}) is that base
 templates are included for \code{type = "all"} but not for \code{type = "cross"}
 or \code{type = "long"}. This can be overridden by setting to \code{TRUE} or
 \code{FALSE} to always include templates (if present), or never include them.}
+
+\item{include_fsaverage}{Logical. Should \code{list_fs_subjects} include the
+\emph{fsaverage} default directory in its return value (if present).}
 }
 \value{
-a vector of Freesurfer IDs found within \code{SUBJECTS_DIR} of the
-appropriate \code{type}. If \code{detailed = TRUE} then the return value is a
-\code{data.frame} instead.
+A vector of Freesurfer IDs found within \code{SUBJECTS_DIR} of the
+appropriate \code{type}. Or - if \code{detailed = TRUE} - a \code{data.frame}.
 }
 \description{
-Given the path to a Freesurfer formatted subjects directory return a list of
-the valid subject directories found within.
+This function produces a list of valid fsids within a given directory.
+In the process it assesses \emph{types} of data
+(cross-sectional, longitudinal, base) and different processing
+statuses (done, running, error). It can filter the returned values on
+the basis of type and status.
+}
+\details{
+\code{list_fs_subjects} is essentially an R-version of the bash script \code{listsubj}
+that is a part of Freesurfer distributions.
+
+Given the path to a directory containing processed Freesurfer data,
+return a list of the directory names (i.e. fsid) for valid data.
+}
+\examples{
+\dontrun{
+
+# Note: subject directory environment variable can be (re-)set from within R:
+Sys.setenv(SUBJECTS_DIR = "/path/to/SUBJECTS_DIR")
+
+# Vector of all "done" freesurfer directories:
+list_fs_subjects(type = "all")
+# Vector of "done" cross-sectional directories:
+list_fs_subjects(type = "cross")
+# Vector of "done" longitudinally processed directories:
+list_fs_subjects(type = "long")
+# Vector of "done" longitudinal base templates:
+list_fs_subjects(type = "base")
+# Vector of "done" longitudinal data and any "done" base templates:
+list_fs_subjects(type = "long", include_base = TRUE)
+
+# A data.frame with meta-data on type and status
+dat <- list_fs_subjects(type = "all", detailed = TRUE, only_done = FALSE)
+# Freesurfer directories with errors:
+dat[dat$error_status,]
+# Freesurfer directories still running:
+dat[dat$running_status,]
+}
+
 }

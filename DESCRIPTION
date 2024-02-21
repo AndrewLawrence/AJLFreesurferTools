@@ -1,7 +1,7 @@
 Package: AJLFreesurferTools
 Type: Package
 Title: A collection of utility functions for working with Freesurfer data in R
-Version: 0.2.0
+Version: 0.3.0
 Author: Andrew J. Lawrence
 Maintainer: Andrew J. Lawrence <lawrenceajl@gmail.com>
 Description: Minimal validation, use with caution.

@@ -15,9 +15,9 @@ chk_dirpath_is_freesurfer <- function(x) {
 }
 
 chk_is_cross <- function(x) {
-  # Only cross-sectional processed data has an orig.mgz file in the
+  # Only cross-sectional processed data has an 001.mgz file in the
   #   mri/orig/ folder #nolint
-  file.exists(paste0(x, "/mri/orig/orig.mgz"))
+  file.exists(paste0(x, "/mri/orig/001.mgz"))
 }
 chk_is_base <- function(x) {
   file.exists(paste0(x, "/base-tps"))

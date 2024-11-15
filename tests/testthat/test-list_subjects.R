@@ -6,6 +6,8 @@ test_that(
     loc <- withr::local_tempdir()
     withr::local_dir(loc)
 
+    withr::local_envvar(.new = c("SUBJECTS_DIR" = getwd()))
+
     # set-up a fake freesurfer directory structure.
     ctrl <- make_dummy_subjectsdir()
 

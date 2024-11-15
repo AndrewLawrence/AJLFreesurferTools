@@ -40,7 +40,7 @@ make_dummy_fs_subject <- function(
   }
 
   switch(type,
-    cross = file.create(paste0(x, "/mri/orig/orig.mgz")),
+    cross = file.create(paste0(x, "/mri/orig/001.mgz")),
     base = file.create(paste0(x, "/base-tps"))
   )
 

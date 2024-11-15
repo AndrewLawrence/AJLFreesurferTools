@@ -28,7 +28,7 @@ a cortical atlas.}
 Leave as "" for no prefix.}
 }
 \value{
-A one row data.frame with ${hemi}\emph{${roi}}${meas} format column names.
+A one row data.frame with \verb{$\{hemi\}_$\{roi\}_$\{meas\}} format column names.
 }
 \description{
 Apply to the results of applying internal \code{read_statsdata} function to a

@@ -118,7 +118,7 @@ read_statsdata <- function(file) {
 #'     a cortical atlas.
 #' @param hemi_label A prefix for the output names (e.g. "lh", "rh", "bl").
 #'     Leave as "" for no prefix.
-#' @return A one row data.frame with ${hemi}_${roi}_${meas} format column names.
+#' @return A one row data.frame with `${hemi}_${roi}_${meas}` format column names.
 atlasstats_to_wide <- function(x,
                                is_aseg = FALSE,
                                is_wm = FALSE,

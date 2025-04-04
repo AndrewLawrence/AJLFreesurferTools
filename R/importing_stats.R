@@ -324,7 +324,7 @@ readstats_subject <- function(s,
                               hemi = c("both", "lh", "rh"),
                               lgi = TRUE,
                               read_aseg = TRUE) {
-  cl <- as.list(match.call())[-1]
+  cl <- as.list(environment())
 
   # Arguments with defaults:
   atlas <- match.arg(atlas, c("DKT", "Desikan", "Destrieux"))
@@ -443,7 +443,7 @@ readstats_subjectlist <- function(s = list_fs_subjects(),
                                   hemi = c("both", "lh", "rh"),
                                   lgi = TRUE,
                                   read_aseg = TRUE) {
-  cl <- as.list(match.call())[-1]
+  cl <- as.list(environment())
   cl$s <- NULL
   cl$dir_path <- NULL
 

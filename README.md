@@ -1,7 +1,8 @@
 
 # AJLFreesurferTools
 
-This R package is a collection of utility functions for working with [Freesurfer](https://surfer.nmr.mgh.harvard.edu/).
+This R package is a collection of utility functions for working 
+with [Freesurfer](https://surfer.nmr.mgh.harvard.edu/) in R.
 
 The package started for personal use and so functions may not be well documented 
 or very robust.
@@ -85,4 +86,5 @@ The idea is this scheme supports:
      identifying analysable data for a regional analysis (v.s. whole brain 
      measures which are typically covariates).
   3) The indicator for data relating only to the left hemisphere is consistently
-      "^lh_", not sometimes "^lh.", sometimes "^lh_", and sometimes "Left-".
+      "^lh_", in contrast to the mix of "^lh.", "^lh_", and "Left-" used by 
+      freesurfer.

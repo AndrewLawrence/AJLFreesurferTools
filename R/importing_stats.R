@@ -118,7 +118,8 @@ read_statsdata <- function(file) {
 #'     a cortical atlas.
 #' @param hemi_label A prefix for the output names (e.g. "lh", "rh", "bl").
 #'     Leave as "" for no prefix.
-#' @return A one row data.frame with `${hemi}_${roi}_${meas}` format column names.
+#' @return A one row data.frame with `${hemi}_${roi}_${meas}`
+#'     format column names.
 atlasstats_to_wide <- function(x,
                                is_aseg = FALSE,
                                is_wm = FALSE,
@@ -209,8 +210,9 @@ atlasstats_to_wide <- function(x,
 rss_merge_unique_two <- function(a, b) {
   sel <- names(b)[names(b) %in% names(a)]
   chk <- vapply(X = sel,
-                FUN = \(k) identical(unname(b[[k]]),
-                                     unname(a[[k]])),
+                FUN = \(k) {
+                  identical(unname(b[[k]]), unname(a[[k]]))
+                },
                 FUN.VALUE = TRUE)
   if ( any(!chk) ) {
     stop("names may not be unique.")
@@ -298,10 +300,17 @@ rss_validate_files <- function(x) {
 #'     (e.g. "/data/study/fs/S01/stats")
 #' @param SUBJECTS_DIR Specify the Freesurfer SUBJECTS_DIR directory.
 #'     SUBJECTS_DIR is ignored if `dir_path` is set.
-#' @param atlas Which cortical parcellation atlas to read.
+#' @param atlas Which cortical parcellation atlas to read?
+#'     Three built-in atlases, or "Custom" to specify using the
+#'     `custom_atlas_suffix` argument.
 #' @param hemi Which hemisphere(s) to export stats from.
 #' @param lgi bool. TRUE: look for additional lgi files for the specified atlas.
 #' @param read_aseg bool. Read aseg stats as well as cortical data?
+#' @param custom_atlas_suffix If the cortical `atlas` = "Custom", then
+#'     `custom_atlas_suffix` should contain the string that identifies the
+#'     associated stats file after the hemisphere indicator: "?h."
+#'      For example, `"BA_exvivo.stats"` would import lh.BA_exvivo.stats and
+#'      rh.BA_exvivo.stats.
 #' @examples
 #' # If SUBJECTS_DIR is set as a system variable:
 #' \dontrun{
@@ -320,15 +329,21 @@ rss_validate_files <- function(x) {
 readstats_subject <- function(s,
                               dir_path = NULL,
                               SUBJECTS_DIR = get_SUBJECTS_DIR(), #nolint
-                              atlas = c("DKT", "Desikan", "Destrieux"),
+                              atlas = c("DKT", "Desikan", "Destrieux",
+                                        "Custom"),
                               hemi = c("both", "lh", "rh"),
                               lgi = TRUE,
-                              read_aseg = TRUE) {
+                              read_aseg = TRUE,
+                              custom_atlas_suffix = NULL) {
   cl <- as.list(environment())
 
   # Arguments with defaults:
-  atlas <- match.arg(atlas, c("DKT", "Desikan", "Destrieux"))
+  atlas <- match.arg(atlas, c("DKT", "Desikan", "Destrieux", "Custom"))
   hemi <- match.arg(hemi, c("both", "lh", "rh"))
+
+  if ( atlas == "Custom" && is.null(custom_atlas_suffix) ) {
+    stop("For atlas='Custom', the custom_atlas_suffix argument must be set.")
+  }
 
   if ( hemi == "both" ) {
     hemi <- c("lh", "rh")
@@ -344,6 +359,10 @@ readstats_subject <- function(s,
   alut <- c(DKT = "aparc.DKTatlas.stats",
             Desikan = "aparc.stats",
             Destrieux = "aparc.a2009s.stats")
+
+  if ( atlas == "Custom" ) {
+    alut <- c(alut, Custom = custom_atlas_suffix)
+  }
 
   flist <- setNames(paste0(fpath, "/", hemi, ".", alut[atlas]), hemi)
   aseg_path <- paste0(fpath, "/aseg.stats")
@@ -439,15 +458,17 @@ readstats_subject <- function(s,
 readstats_subjectlist <- function(s = list_fs_subjects(),
                                   dir_path = NULL,
                                   SUBJECTS_DIR = get_SUBJECTS_DIR(), #nolint
-                                  atlas = c("DKT", "Desikan", "Destrieux"),
+                                  atlas = c("DKT", "Desikan",
+                                            "Destrieux", "Custom"),
                                   hemi = c("both", "lh", "rh"),
                                   lgi = TRUE,
-                                  read_aseg = TRUE) {
+                                  read_aseg = TRUE,
+                                  custom_atlas_suffix = NULL) {
   cl <- as.list(environment())
   cl$s <- NULL
   cl$dir_path <- NULL
 
-  cat("reading stats for: ", length(s), " subjects\n")
+  cat("reading stats for:", length(s), "subjects\n")
 
   if ( !is.null(dir_path) ) {
 

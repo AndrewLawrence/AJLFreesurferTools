@@ -8,10 +8,11 @@ readstats_subject(
   s,
   dir_path = NULL,
   SUBJECTS_DIR = get_SUBJECTS_DIR(),
-  atlas = c("DKT", "Desikan", "Destrieux"),
+  atlas = c("DKT", "Desikan", "Destrieux", "Custom"),
   hemi = c("both", "lh", "rh"),
   lgi = TRUE,
-  read_aseg = TRUE
+  read_aseg = TRUE,
+  custom_atlas_suffix = NULL
 )
 }
 \arguments{
@@ -25,13 +26,21 @@ searched for the subject \code{s}.}
 \item{SUBJECTS_DIR}{Specify the Freesurfer SUBJECTS_DIR directory.
 SUBJECTS_DIR is ignored if \code{dir_path} is set.}
 
-\item{atlas}{Which cortical parcellation atlas to read.}
+\item{atlas}{Which cortical parcellation atlas to read?
+Three built-in atlases, or "Custom" to specify using the
+\code{custom_atlas_suffix} argument.}
 
 \item{hemi}{Which hemisphere(s) to export stats from.}
 
 \item{lgi}{bool. TRUE: look for additional lgi files for the specified atlas.}
 
 \item{read_aseg}{bool. Read aseg stats as well as cortical data?}
+
+\item{custom_atlas_suffix}{If the cortical \code{atlas} = "Custom", then
+\code{custom_atlas_suffix} should contain the string that identifies the
+associated stats file after the hemisphere indicator: "?h."
+For example, \code{"BA_exvivo.stats"} would import lh.BA_exvivo.stats and
+rh.BA_exvivo.stats.}
 }
 \value{
 A one row data.frame containing stats values. Variable names follow

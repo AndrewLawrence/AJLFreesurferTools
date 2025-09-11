@@ -302,15 +302,16 @@ rss_validate_files <- function(x) {
 #'     SUBJECTS_DIR is ignored if `dir_path` is set.
 #' @param atlas Which cortical parcellation atlas to read?
 #'     Three built-in atlases, or "Custom" to specify using the
-#'     `custom_atlas_suffix` argument.
+#'     `custom_atlas_name` argument.
 #' @param hemi Which hemisphere(s) to export stats from.
 #' @param lgi bool. TRUE: look for additional lgi files for the specified atlas.
 #' @param read_aseg bool. Read aseg stats as well as cortical data?
-#' @param custom_atlas_suffix If the cortical `atlas` = "Custom", then
-#'     `custom_atlas_suffix` should contain the string that identifies the
+#' @param custom_atlas_name If the cortical `atlas` = "Custom", then
+#'     `custom_atlas_name` should contain the string that identifies the
 #'     associated stats file after the hemisphere indicator: "?h."
-#'      For example, `"BA_exvivo.stats"` would import lh.BA_exvivo.stats and
-#'      rh.BA_exvivo.stats.
+#'      For example, `"BA_exvivo"` would import lh.BA_exvivo.stats and
+#'      rh.BA_exvivo.stats and if lgi = TRUE the ?h.BA_exvivo.pial_lgi.stats
+#'      files.
 #' @examples
 #' # If SUBJECTS_DIR is set as a system variable:
 #' \dontrun{
@@ -334,15 +335,15 @@ readstats_subject <- function(s,
                               hemi = c("both", "lh", "rh"),
                               lgi = TRUE,
                               read_aseg = TRUE,
-                              custom_atlas_suffix = NULL) {
+                              custom_atlas_name = NULL) {
   cl <- as.list(environment())
 
   # Arguments with defaults:
   atlas <- match.arg(atlas, c("DKT", "Desikan", "Destrieux", "Custom"))
   hemi <- match.arg(hemi, c("both", "lh", "rh"))
 
-  if ( atlas == "Custom" && is.null(custom_atlas_suffix) ) {
-    stop("For atlas='Custom', the custom_atlas_suffix argument must be set.")
+  if ( atlas == "Custom" && is.null(custom_atlas_name) ) {
+    stop("For atlas='Custom', the custom_atlas_name argument must be set.")
   }
 
   if ( hemi == "both" ) {
@@ -361,7 +362,7 @@ readstats_subject <- function(s,
             Destrieux = "aparc.a2009s.stats")
 
   if ( atlas == "Custom" ) {
-    alut <- c(alut, Custom = custom_atlas_suffix)
+    alut <- c(alut, Custom = paste0(custom_atlas_name, ".stats"))
   }
 
   flist <- setNames(paste0(fpath, "/", hemi, ".", alut[atlas]), hemi)
@@ -401,8 +402,13 @@ readstats_subject <- function(s,
                 Desikan = "aparc.pial_lgi.stats",
                 Destrieux = "aparc.a2009s.pial_lgi.stats")
 
+  if ( atlas == "Custom" ) {
+    lgi_alut <- c(lgi_alut,
+                  Custom = paste0(custom_atlas_name, ".pial_lgi.stats"))
+  }
+
   flist <- setNames(paste0(fpath, "/", hemi, ".", lgi_alut[atlas]), hemi)
-  # filter to exisiting files and if non return:
+  # filter to existing files and, if none, return:
   flist <- flist[file.exists(flist)]
   if ( length(flist) < 1 ) return(fdat)
 
@@ -463,7 +469,7 @@ readstats_subjectlist <- function(s = list_fs_subjects(),
                                   hemi = c("both", "lh", "rh"),
                                   lgi = TRUE,
                                   read_aseg = TRUE,
-                                  custom_atlas_suffix = NULL) {
+                                  custom_atlas_name = NULL) {
   cl <- as.list(environment())
   cl$s <- NULL
   cl$dir_path <- NULL

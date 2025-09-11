@@ -12,7 +12,7 @@ readstats_subjectlist(
   hemi = c("both", "lh", "rh"),
   lgi = TRUE,
   read_aseg = TRUE,
-  custom_atlas_suffix = NULL
+  custom_atlas_name = NULL
 )
 }
 \arguments{
@@ -28,7 +28,7 @@ SUBJECTS_DIR is ignored if \code{dir_path} is set.}
 
 \item{atlas}{Which cortical parcellation atlas to read?
 Three built-in atlases, or "Custom" to specify using the
-\code{custom_atlas_suffix} argument.}
+\code{custom_atlas_name} argument.}
 
 \item{hemi}{Which hemisphere(s) to export stats from.}
 
@@ -36,11 +36,12 @@ Three built-in atlases, or "Custom" to specify using the
 
 \item{read_aseg}{bool. Read aseg stats as well as cortical data?}
 
-\item{custom_atlas_suffix}{If the cortical \code{atlas} = "Custom", then
-\code{custom_atlas_suffix} should contain the string that identifies the
+\item{custom_atlas_name}{If the cortical \code{atlas} = "Custom", then
+\code{custom_atlas_name} should contain the string that identifies the
 associated stats file after the hemisphere indicator: "?h."
-For example, \code{"BA_exvivo.stats"} would import lh.BA_exvivo.stats and
-rh.BA_exvivo.stats.}
+For example, \code{"BA_exvivo"} would import lh.BA_exvivo.stats and
+rh.BA_exvivo.stats and if lgi = TRUE the ?h.BA_exvivo.pial_lgi.stats
+files.}
 }
 \value{
 Given \emph{n} subject IDs returns a \emph{n} row data.frame containing stats

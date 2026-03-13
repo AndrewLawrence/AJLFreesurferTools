@@ -10,12 +10,21 @@
   lh_lgi_vars <- .extract_stats_vars(x, "lh_", "_lgi")
   rh_lgi_vars <- .extract_stats_vars(x, "rh_", "_lgi")
 
-  lh_area_vars <- gsub("_lgi", "_area", lh_lgi_vars)
-  rh_area_vars <- gsub("_lgi", "_area", rh_lgi_vars)
+  # Weird exceptions:
+  lh_lgi_vars <- grep("_unknown_", lh_lgi_vars, value = TRUE, invert = TRUE)
+  rh_lgi_vars <- grep("_unknown_", rh_lgi_vars, value = TRUE, invert = TRUE)
+  lh_lgi_vars <- grep("_Unknown_", lh_lgi_vars, value = TRUE, invert = TRUE)
+  rh_lgi_vars <- grep("_Unknown_", rh_lgi_vars, value = TRUE, invert = TRUE)
+  lh_lgi_vars <- grep("_Medial.wall_", lh_lgi_vars, value = TRUE, invert = TRUE)
+  rh_lgi_vars <- grep("_Medial.wall_", rh_lgi_vars, value = TRUE, invert = TRUE)
 
   # in case calculate_average_lgi_stats has already been run:
   lh_lgi_vars <- lh_lgi_vars[lh_lgi_vars != "lh_cortex_lgi"]
   rh_lgi_vars <- rh_lgi_vars[rh_lgi_vars != "rh_cortex_lgi"]
+
+  # we should fine equivalent area variables:
+  lh_area_vars <- gsub("_lgi$", "_area", lh_lgi_vars)
+  rh_area_vars <- gsub("_lgi$", "_area", rh_lgi_vars)
 
   # We only want the weighted average from regions with an associated
   #   surface area:

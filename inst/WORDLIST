@@ -1,6 +1,5 @@
 Bonferroni
 CerebralWhiteMatterVol
-DIR
 DKT
 DKTatlas
 DODS
@@ -28,12 +27,11 @@ aseg
 atlaslabel
 atlasstats
 bl
-bool
 csv
 dat
 df
-dir
 eTIV
+exvivo
 fmt
 freesurfer
 freesurferformats
@@ -48,7 +46,6 @@ gyrification
 hemi
 lgi
 lh
-meas
 parcellation
 pial
 qc

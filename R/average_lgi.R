@@ -13,6 +13,12 @@
   lh_area_vars <- gsub("_lgi", "_area", lh_lgi_vars)
   rh_area_vars <- gsub("_lgi", "_area", rh_lgi_vars)
 
+  # in case calculate_average_lgi_stats has already been run:
+  lh_lgi_vars <- lh_lgi_vars[lh_lgi_vars != "lh_cortex_lgi"]
+  rh_lgi_vars <- rh_lgi_vars[rh_lgi_vars != "rh_cortex_lgi"]
+
+  # We only want the weighted average from regions with an associated
+  #   surface area:
   lh_valid <- lh_area_vars %in% colnames(x)
   rh_valid <- rh_area_vars %in% colnames(x)
 
